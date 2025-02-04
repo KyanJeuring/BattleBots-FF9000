@@ -6,15 +6,15 @@ Each team has 3 sub-teams consisting of 2 people. Each sub-team works on a robot
 ## Our sub-teams
 ### Team 1:
 
-    - [Cosmin Buzic](https://github.com/CosminBuzicUni)
-    - [Stefania Panaite](https://github.com/Stefania-SP)
+- [Cosmin Buzic](https://github.com/CosminBuzicUni)
+- [Stefania Panaite](https://github.com/Stefania-SP)
 
 ### Team 2:
 
-    - [Kyan Jeuring](https://github.com/kyanjeuring)
-    - [Miriam Cerulíková](https://github.com/MiriamCerulikova)
+- [Kyan Jeuring](https://github.com/kyanjeuring)
+- [Miriam Cerulíková](https://github.com/MiriamCerulikova)
 
 ### Team 3:
 
-    - [Miguel Petsica Brandão Cavaleiro](https://github.com/Miguel-Cavaleiro-IT)
-    - [Volkan Yildirim](https://github.com/volkanyildirim33)
+- [Miguel Petsica Brandão Cavaleiro](https://github.com/Miguel-Cavaleiro-IT)
+- [Volkan Yildirim](https://github.com/volkanyildirim33)
