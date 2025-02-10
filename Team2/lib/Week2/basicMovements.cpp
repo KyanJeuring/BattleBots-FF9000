@@ -5,8 +5,9 @@ const int       MOTOR_A_BACKWARD = 11;
 const int       MOTOR_A_FORWARD = 10;
 const int       MOTOR_B_FORWARD = 6;
 const int       MOTOR_B_BACKWARD = 5;
-const int       BUTTON_1 = 3;
-const int       BUTTON_2 = 4;
+const int       BUTTON_1 = 2;
+const int       BUTTON_2 = 3;
+const int       BUTTON_3 = 4;
 
 // Define state variables for the millis
 bool            _button1Pressed = false;
