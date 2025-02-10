@@ -52,37 +52,42 @@ void buttonPress()
     if(digitalRead(BUTTON_1) == LOW && !_button1Pressed)
     {
         _button1Pressed = true;
-        _lastTime = millis();
-        driveForward(255);
+        _lastTime = millis(); //50ms
     }
-    if (_button1Pressed && millis() - _lastTime >= 6000)
+
+    if (_button1Pressed)
     {
-        turnRight(255);
-        _lastTime = millis();
-        _button1Pressed = false;
+        unsigned long currentTime = millis();
+        if (currentTime - _lastTime < 6000) // Drive forward for 6 seconds
+        {
+            driveForward(255);
+        }
+        else if (currentTime - _lastTime < 8000) // Turn right for 2 seconds
+        {
+            turnRight(255);
+        }
+        else if (currentTime - _lastTime < 12000) // Drive backward for 4 seconds
+        {
+            driveBackward(255);
+        }
+        else if (currentTime - _lastTime < 14000) // Turn left for 2 seconds
+        {
+            turnLeft(255);
+        }
+        else // Stop the robot
+        {
+            driveStop();
+            _button1Pressed = false; // Reset the button press state
+        }
     }
-    if (_button1Pressed && millis() - _lastTime >= 2000)
-    {
-        driveBackward(255);
-        _lastTime = millis();
-        _button1Pressed = false;
-    }
-    if (_button1Pressed && millis() - _lastTime >= 6000)
-    {
-        turnLeft(255);
-        _lastTime = millis();
-        _button1Pressed = false;
-    }
-    if (_button1Pressed && millis() - _lastTime >= 2000)
-    {
-        driveStop();
-        _button1Pressed = false;
-    }
-    if(digitalRead(BUTTON_2) == LOW && !_button1Pressed)
+
+    // Check if the stop button is pressed
+    if(digitalRead(BUTTON_2) == LOW)
     {
         _button2Pressed = true;
         _lastTime = millis();
         driveStop();
+        _button1Pressed = false; // Reset the button press state
     }
 }
 
