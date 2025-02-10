@@ -78,11 +78,11 @@ void loop()
 
 void buttonPress()
 {
-    if (digitalRead(BUTTON_1) == HIGH)
+    if (digitalRead(BUTTON_1) == LOW)
     {
         _button1Pressed = true;
     }
-    else if (digitalRead(BUTTON_2) == HIGH)
+    else if (digitalRead(BUTTON_2) == LOW)
     {
         _button2Pressed = true;
     }
