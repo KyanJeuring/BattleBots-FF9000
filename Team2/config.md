@@ -12,7 +12,8 @@ P12 -> Gr (Gripper)
 
 
 ## Sonar Sensor (Optional)
-
+P7 -> Trig
+P8 -> Echo
 
 
 ## Motors
