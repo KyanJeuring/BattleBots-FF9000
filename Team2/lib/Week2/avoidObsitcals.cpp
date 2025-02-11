@@ -43,7 +43,7 @@ void setup()
     pinMode(SONAR_SENSOR_TRIGGER, OUTPUT);
     pinMode(SONAR_SENSOR_ECHO, INPUT);
 
-    // Initalize the outputs
+    // Initialize the outputs
     digitalWrite(MOTOR_A_BACKWARD, HIGH);
     digitalWrite(MOTOR_A_FORWARD, HIGH);
     digitalWrite(MOTOR_B_FORWARD, HIGH);
