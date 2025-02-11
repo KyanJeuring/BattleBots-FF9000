@@ -10,6 +10,9 @@ P4 -> Button 3
 
 P12 -> Gr (Gripper)
 
+## NeoPixels
+
+P4 -> NO -> NeoPixel (Output)
 
 ## Sonar Sensor (Optional)
 P7 -> Trig
