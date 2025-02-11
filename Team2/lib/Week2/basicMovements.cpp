@@ -25,6 +25,9 @@ int calibrate(int n, int offset);
 
 void setup()
 {
+    // Initialize serial communication
+    Serial.begin(9600);
+    
     // Initialize the input and outputs
     pinMode(MOTOR_A_BACKWARD, OUTPUT);
     pinMode(MOTOR_A_FORWARD, OUTPUT);

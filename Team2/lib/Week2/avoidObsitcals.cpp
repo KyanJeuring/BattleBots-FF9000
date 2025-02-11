@@ -16,7 +16,7 @@ bool            _button1Pressed = false;
 bool            _button2Pressed = false;
 unsigned long   _lastTime = 0;
 unsigned long   _startMillis = 0;
-bool            _turning = false;
+bool            _avoidObject = false;
 
 // Calibration offsets
 const int CALIBRATION_OFFSET_A = 10; // Adjust this value as needed
@@ -30,6 +30,9 @@ long readSonarSensor();
 
 void setup()
 {
+    // Initialize serial communication
+    Serial.begin(9600);
+
     // Initialize the input and outputs
     pinMode(MOTOR_A_BACKWARD, OUTPUT);
     pinMode(MOTOR_A_FORWARD, OUTPUT);
@@ -39,28 +42,61 @@ void setup()
     pinMode(BUTTON_2, INPUT);
     pinMode(SONAR_SENSOR_TRIGGER, OUTPUT);
     pinMode(SONAR_SENSOR_ECHO, INPUT);
+
+    // Initalize the outputs
+    digitalWrite(MOTOR_A_BACKWARD, HIGH);
+    digitalWrite(MOTOR_A_FORWARD, HIGH);
+    digitalWrite(MOTOR_B_FORWARD, HIGH);
+    digitalWrite(MOTOR_B_BACKWARD, HIGH);
+    digitalWrite(SONAR_SENSOR_TRIGGER, LOW);
 }
 
 void loop()
 {
     unsigned long currentMillis = millis();
 
-    if (_turning && currentMillis - _startMillis >= 1000)
+    if (_avoidObject && currentMillis - _startMillis >= 1000)
     {
-        _turning = false;
+        _avoidObject = false;
     }
-    else if (!_turning)
+    else if (!_avoidObject)
     {
         long distance = readSonarSensor();
-        if (distance < 3)
+        if (distance < 15)
         {
-            drive(0, 255, 255, 0); // Turn right
+            // Turn right
+            drive(255, 0, 0, 255);
+            delay(500);
+
+            // Go forward
+            drive(255, 0, 255, 0);
+            delay(1000);
+
+            // Turn left
+            drive(0, 255, 255, 0);
+            delay(500);
+
+            // Go forward
+            drive(255, 0, 255, 0);
+            delay(1000);
+
+            // Turn left
+            drive(0, 255, 255, 0);
+            delay(500);
+
+            // Go forward
+            drive(255, 0, 255, 0);
+            delay(1000);
+
+            // Turn right
+            drive(255, 0, 0, 255);
+            delay(500);
             _startMillis = currentMillis;
-            _turning = true;
+            _avoidObject = true;
         }
         else
         {
-            drive(255, 0, 255, 0); // Move forward
+            drive(255, 0, 255, 0); // Drive forward
         }
     }
 }
