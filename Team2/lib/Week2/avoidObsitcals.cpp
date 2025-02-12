@@ -1,22 +1,19 @@
 #include <Arduino.h>
 
 // Define pins
+const int       BLUETOOTH_TRANSMIT= 1;
 const int       MOTOR_A_BACKWARD = 11;
 const int       MOTOR_A_FORWARD = 10;
 const int       MOTOR_B_FORWARD = 6;
 const int       MOTOR_B_BACKWARD = 5;
 const int       SONAR_SENSOR_ECHO = 8;
 const int       SONAR_SENSOR_TRIGGER = 7;
-const int       BUTTON_1 = 2;
-const int       BUTTON_2 = 3;
-const int       BUTTON_3 = 4;
 
 // Define state variables for the millis
-bool            _button1Pressed = false;
-bool            _button2Pressed = false;
 unsigned long   _lastTime = 0;
 unsigned long   _startMillis = 0;
 bool            _avoidObject = false;
+bool            _emergencyStop = false;
 
 // Calibration offsets
 const int CALIBRATION_OFFSET_A = 10; // Adjust this value as needed
@@ -27,6 +24,7 @@ void drive(int motorAForward, int motorABackward, int motorBForward, int motorBB
 void buttonPress();
 int calibrate(int n, int offset);
 long readSonarSensor();
+void setNeoPixel(int index, uint32_t color);
 
 void setup()
 {
@@ -34,12 +32,11 @@ void setup()
     Serial.begin(9600);
 
     // Initialize the input and outputs
+    pinMode(BLUETOOTH_TRANSMIT, OUTPUT);
     pinMode(MOTOR_A_BACKWARD, OUTPUT);
     pinMode(MOTOR_A_FORWARD, OUTPUT);
     pinMode(MOTOR_B_FORWARD, OUTPUT);
     pinMode(MOTOR_B_BACKWARD, OUTPUT);
-    pinMode(BUTTON_1, INPUT);
-    pinMode(BUTTON_2, INPUT);
     pinMode(SONAR_SENSOR_TRIGGER, OUTPUT);
     pinMode(SONAR_SENSOR_ECHO, INPUT);
 
@@ -48,7 +45,6 @@ void setup()
     digitalWrite(MOTOR_A_FORWARD, HIGH);
     digitalWrite(MOTOR_B_FORWARD, HIGH);
     digitalWrite(MOTOR_B_BACKWARD, HIGH);
-    digitalWrite(SONAR_SENSOR_TRIGGER, LOW);
 }
 
 void loop()
@@ -64,31 +60,34 @@ void loop()
         long distance = readSonarSensor();
         if (distance < 15)
         {
-            // Turn right
+            Serial.print("Obstacle detected at distance: ");
+            Serial.print(distance);
+            Serial.println(". Avoiding object...");
+            Serial.println("Turn left");
             drive(255, 0, 0, 255);
             delay(500);
 
-            // Go forward
+            Serial.println("Go forward");
             drive(255, 0, 255, 0);
             delay(1000);
 
-            // Turn left
+            Serial.println("Turn right");
             drive(0, 255, 255, 0);
             delay(500);
 
-            // Go forward
+            Serial.println("Go forward");
             drive(255, 0, 255, 0);
             delay(1000);
 
-            // Turn left
+            Serial.println("Turn right");
             drive(0, 255, 255, 0);
             delay(500);
 
-            // Go forward
+            Serial.println("Go forward");
             drive(255, 0, 255, 0);
             delay(1000);
 
-            // Turn right
+            Serial.println("Turn left");
             drive(255, 0, 0, 255);
             delay(500);
             _startMillis = currentMillis;
@@ -99,6 +98,7 @@ void loop()
             drive(255, 0, 255, 0); // Drive forward
         }
     }
+
 }
 
 long readSonarSensor()
@@ -112,7 +112,7 @@ long readSonarSensor()
 
     // Read the echo pin and calculate the distance
     long duration = pulseIn(SONAR_SENSOR_ECHO, HIGH);
-    return duration * 0.034 / 2; // Convert duration to distance in cm
+    return duration * 0.034 / 2; // Convert duration to distance in cm by using the speed of sound (0.034 cm per microsecond)
 }
 
 // Drive with calibration

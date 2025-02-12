@@ -1,37 +1,23 @@
 #include <Arduino.h>
-#include <Adafruit_NeoPixel.h>
 
 // Define pins
+const int       BLUETOOTH_TRANSMIT= 1;
 const int       MOTOR_A_BACKWARD = 11;
 const int       MOTOR_A_FORWARD = 10;
 const int       MOTOR_B_FORWARD = 6;
 const int       MOTOR_B_BACKWARD = 5;
 const int       SONAR_SENSOR_ECHO = 8;
 const int       SONAR_SENSOR_TRIGGER = 7;
-const int       BUTTON_1 = 2;
-const int       BUTTON_2 = 3;
-const int       NEOPIXEL_PIN = 4;
-const int       NUM_PIXELS = 4;
-
-// Define the NeoPixel
-const int       NEOPIXEL_BOTTOM_RIGHT = 0;
-const int       NEOPIXEL_TOP_RIGHT = 1;
-const int       NEOPIXEL_TOP_LEFT = 2;
-const int       NEOPIXEL_BOTTOM_LEFT = 3;
 
 // Define state variables for the millis
-bool            _button1Pressed = false;
-bool            _button2Pressed = false;
 unsigned long   _lastTime = 0;
 unsigned long   _startMillis = 0;
 bool            _avoidObject = false;
+bool            _emergencyStop = false;
 
 // Calibration offsets
 const int CALIBRATION_OFFSET_A = 10; // Adjust this value as needed
 const int CALIBRATION_OFFSET_B = 5;  // Adjust this value as needed
-
-// Initialize the NeoPixel strip
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 // Define the function prototype
 void drive(int motorAForward, int motorABackward, int motorBForward, int motorBBackward);
@@ -46,26 +32,19 @@ void setup()
     Serial.begin(9600);
 
     // Initialize the input and outputs
+    pinMode(BLUETOOTH_TRANSMIT, OUTPUT);
     pinMode(MOTOR_A_BACKWARD, OUTPUT);
     pinMode(MOTOR_A_FORWARD, OUTPUT);
     pinMode(MOTOR_B_FORWARD, OUTPUT);
     pinMode(MOTOR_B_BACKWARD, OUTPUT);
-    pinMode(BUTTON_1, INPUT);
-    pinMode(BUTTON_2, INPUT);
     pinMode(SONAR_SENSOR_TRIGGER, OUTPUT);
     pinMode(SONAR_SENSOR_ECHO, INPUT);
-    pinMode(NEOPIXEL_PIN, OUTPUT);
 
     // Initialize the outputs
     digitalWrite(MOTOR_A_BACKWARD, HIGH);
     digitalWrite(MOTOR_A_FORWARD, HIGH);
     digitalWrite(MOTOR_B_FORWARD, HIGH);
     digitalWrite(MOTOR_B_BACKWARD, HIGH);
-    digitalWrite(NEOPIXEL_PIN, HIGH);
-
-    // Initialize the NeoPixel strip
-    strip.begin();
-    strip.show(); // Initialize all pixels to 'off'
 }
 
 void loop()
@@ -81,50 +60,45 @@ void loop()
         long distance = readSonarSensor();
         if (distance < 15)
         {
-            // Turn right
+            Serial.print("Obstacle detected at distance: ");
+            Serial.print(distance);
+            Serial.println(". Avoiding object...");
+            Serial.println("Turn left");
             drive(255, 0, 0, 255);
-            setNeoPixel(NEOPIXEL_TOP_RIGHT, strip.Color(255, 0, 0));
             delay(500);
 
-            // Go forward
+            Serial.println("Go forward");
             drive(255, 0, 255, 0);
-            strip.clear();
             delay(1000);
 
-            // Turn left
-            drive(NEOPIXEL_TOP_LEFT, 255, 255, 0);
-            setNeoPixel(0, strip.Color(0, 255, 0));
-            delay(500);
-
-            // Go forward
-            drive(255, 0, 255, 0);
-            strip.clear();
-            delay(1000);
-
-            // Turn left
+            Serial.println("Turn right");
             drive(0, 255, 255, 0);
-            setNeoPixel(NEOPIXEL_TOP_LEFT, strip.Color(0, 255, 0));
             delay(500);
 
-            // Go forward
+            Serial.println("Go forward");
             drive(255, 0, 255, 0);
-            strip.clear();
             delay(1000);
 
-            // Turn right
+            Serial.println("Turn right");
+            drive(0, 255, 255, 0);
+            delay(500);
+
+            Serial.println("Go forward");
+            drive(255, 0, 255, 0);
+            delay(1000);
+
+            Serial.println("Turn left");
             drive(255, 0, 0, 255);
-            setNeoPixel(NEOPIXEL_TOP_RIGHT, strip.Color(255, 0, 0));
             delay(500);
             _startMillis = currentMillis;
             _avoidObject = true;
         }
         else
         {
-            // Drive forward
-            drive(255, 0, 255, 0);
-            strip.clear();
+            drive(255, 0, 255, 0); // Drive forward
         }
     }
+
 }
 
 long readSonarSensor()
@@ -159,10 +133,4 @@ int calibrate(int n, int offset)
 {
     int calibratedValue = n - offset; // Subtract the offset from the input value
     return (calibratedValue < 0) ? 0 : calibratedValue; // Ensure the value doesn't go below 0
-}
-
-void setNeoPixel(int index, uint32_t color)
-{
-    strip.setPixelColor(index, color);
-    strip.show();
 }
