@@ -46,30 +46,35 @@ void loop()
     {
         if (currentMillis - _startMillis < 6000)
         {
+            Serial.println("Go forward");
             drive(255, 0, 255, 0); // Move forward
         }
         else if (currentMillis - _startMillis < 8000)
         {
+            Serial.println("Turn right");
             drive(160, 0, 255, 0); // Turn right
         }
         else if (currentMillis - _startMillis < 12000)
         {
+            Serial.println("Go backward");
             drive(0, 255, 0, 255); // Move backward
         }
         else if (currentMillis - _startMillis < 14000)
         {
+            Serial.println("Turn left");
             drive(255, 0, 160, 0); // Turn left
         }
         else
         {
-            drive(0, 0, 0, 0); // Stop
+            Serial.println("Stop");
             _button1Pressed = false; // Reset button state
         }
     }
 
     if (_button2Pressed)
     {
-        drive(0, 0, 0, 0); // Stop
+        Serial.println("Stop");
+        drive(0, 0, 0, 0);
         _button2Pressed = false; // Reset button state
         _button1Pressed = false; // Reset button 1 state
         _startMillis = currentMillis; // Reset start time
@@ -84,10 +89,12 @@ void buttonPress()
 {
     if (digitalRead(BUTTON_1) == LOW)
     {
+        Serial.println("Button 1 pressed");
         _button1Pressed = true;
     }
     else if (digitalRead(BUTTON_2) == LOW)
     {
+        Serial.println("Button 2 pressed");
         _button2Pressed = true;
     }
 }

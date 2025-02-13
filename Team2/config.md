@@ -18,6 +18,10 @@ P4 -> NO -> NeoPixel (Output)
 P7 -> Trig
 P8 -> Echo
 
+### Sonar Sensor Range
+Minimum = 1
+Maximum = 1193
+
 
 ## Motors
 
