@@ -118,15 +118,10 @@ long readSonarSensor()
 // Drive with calibration
 void drive(int motorAForward, int motorABackward, int motorBForward, int motorBBackward)
 {
-    int calibratedAForward = calibrate(motorAForward, CALIBRATION_OFFSET_A);
-    int calibratedABackward = calibrate(motorABackward, CALIBRATION_OFFSET_A);
-    int calibratedBForward = calibrate(motorBForward, CALIBRATION_OFFSET_B);
-    int calibratedBBackward = calibrate(motorBBackward, CALIBRATION_OFFSET_B);
-
-    analogWrite(MOTOR_A_FORWARD, calibratedAForward);
-    analogWrite(MOTOR_A_BACKWARD, calibratedABackward);
-    analogWrite(MOTOR_B_FORWARD, calibratedBForward);
-    analogWrite(MOTOR_B_BACKWARD, calibratedBBackward);
+    analogWrite(MOTOR_A_FORWARD, calibrate(motorAForward, CALIBRATION_OFFSET_A));
+    analogWrite(MOTOR_A_BACKWARD, calibrate(motorABackward, CALIBRATION_OFFSET_A));
+    analogWrite(MOTOR_B_FORWARD, calibrate(motorBForward, CALIBRATION_OFFSET_B));
+    analogWrite(MOTOR_B_BACKWARD, calibrate(motorBBackward, CALIBRATION_OFFSET_B));
 }
 
 int calibrate(int n, int offset)
