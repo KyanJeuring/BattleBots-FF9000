@@ -24,7 +24,6 @@ void drive(int motorAForward, int motorABackward, int motorBForward, int motorBB
 void buttonPress();
 int calibrate(int n, int offset);
 long readSonarSensor();
-void setNeoPixel(int index, uint32_t color);
 
 void setup()
 {

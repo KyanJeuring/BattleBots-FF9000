@@ -10,7 +10,7 @@ const int       SONAR_SENSOR_ECHO = 8;
 const int       SONAR_SENSOR_TRIGGER = 7;
 const int       LINE_SENSORS[] = {A0, A1, A2, A3, A4, A5, A6, A7};
 
-// Define state variables for the millis
+// Define state variables for the millis 
 unsigned long   _lastTime = 0;
 unsigned long   _startMillis = 0;
 bool            _avoidObject = false;
@@ -25,7 +25,6 @@ void drive(int motorAForward, int motorABackward, int motorBForward, int motorBB
 void buttonPress();
 int calibrate(int n, int offset);
 long readSonarSensor();
-void setNeoPixel(int index, uint32_t color);
 
 void setup()
 {
@@ -103,7 +102,6 @@ void loop()
             drive(255, 0, 255, 0); // Drive forward
         }
     }
-
 }
 
 long readSonarSensor()
