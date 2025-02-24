@@ -1,8 +1,8 @@
 #include <Arduino.h>
 
 // Define pins
-const int       MOTOR_A_BACKWARD = 11;
-const int       MOTOR_A_FORWARD = 10;
+const int       MOTOR_A_BACKWARD = 10;
+const int       MOTOR_A_FORWARD = 9;
 const int       MOTOR_B_FORWARD = 6;
 const int       MOTOR_B_BACKWARD = 5;
 const int       BUTTON_1 = 2;

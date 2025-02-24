@@ -8,6 +8,7 @@ const int       MOTOR_B_FORWARD = 6;
 const int       MOTOR_B_BACKWARD = 5;
 const int       SONAR_SENSOR_ECHO = 8;
 const int       SONAR_SENSOR_TRIGGER = 7;
+const int       LINE_SENSORS[] = {A0, A1, A2, A3, A4, A5, A6, A7};
 
 // Define state variables for the millis
 unsigned long   _lastTime = 0;
@@ -31,6 +32,10 @@ void setup()
     // Initialize serial communication
     Serial.begin(9600);
 
+    for(int i = 0; i < sizeof(LINE_SENSORS); i++)
+    {
+        pinMode(LINE_SENSORS[i], INPUT);
+    }
     // Initialize the input and outputs
     pinMode(BLUETOOTH_TRANSMIT, OUTPUT);
     pinMode(MOTOR_A_BACKWARD, OUTPUT);
