@@ -13,7 +13,6 @@ const int       SONAR_SENSOR_TRIGGER = 7;
 unsigned long   _lastTime = 0;
 unsigned long   _startMillis = 0;
 bool            _avoidObject = false;
-bool            _emergencyStop = false;
 
 // Calibration offsets
 const int CALIBRATION_OFFSET_A = 10; // Adjust this value as needed

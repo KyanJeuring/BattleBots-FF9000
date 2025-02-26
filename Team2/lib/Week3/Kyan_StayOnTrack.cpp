@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Adafruit_NeoPixel.h>
 
 // Define pins
 const int       BLUETOOTH_TRANSMIT= 1;
@@ -14,7 +15,6 @@ const int       LINE_SENSORS[] = {A0, A1, A2, A3, A4, A5, A6, A7};
 unsigned long   _lastTime = 0;
 unsigned long   _startMillis = 0;
 bool            _avoidObject = false;
-bool            _emergencyStop = false;
 
 // Calibration offsets
 const int CALIBRATION_OFFSET_A = 10; // Adjust this value as needed
@@ -55,68 +55,46 @@ void loop()
 {
     unsigned long currentMillis = millis();
 
-    if (_avoidObject && currentMillis - _startMillis >= 1000)
-    {
-        _avoidObject = false;
-    }
-    else if (!_avoidObject)
-    {
-        long distance = readSonarSensor();
-        if (distance < 15)
-        {
-            Serial.print("Obstacle detected at distance: ");
-            Serial.print(distance);
-            Serial.println(". Avoiding object...");
-            Serial.println("Turn left");
-            drive(255, 0, 0, 255);
-            delay(500);
-
-            Serial.println("Go forward");
-            drive(255, 0, 255, 0);
-            delay(1000);
-
-            Serial.println("Turn right");
-            drive(0, 255, 255, 0);
-            delay(500);
-
-            Serial.println("Go forward");
-            drive(255, 0, 255, 0);
-            delay(1000);
-
-            Serial.println("Turn right");
-            drive(0, 255, 255, 0);
-            delay(500);
-
-            Serial.println("Go forward");
-            drive(255, 0, 255, 0);
-            delay(1000);
-
-            Serial.println("Turn left");
-            drive(255, 0, 0, 255);
-            delay(500);
-            _startMillis = currentMillis;
-            _avoidObject = true;
-        }
-        else
-        {
-            drive(255, 0, 255, 0); // Drive forward
-        }
-    }
 }
 
 long readSonarSensor()
 {
-    // Send a pulse to trigger the sonar sensor
-    digitalWrite(SONAR_SENSOR_TRIGGER, LOW);
-    delayMicroseconds(2);
-    digitalWrite(SONAR_SENSOR_TRIGGER, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(SONAR_SENSOR_TRIGGER, LOW);
+    long distance1 = 0;
+    long distance2 = 0;
+    long distance3 = 0;
 
-    // Read the echo pin and calculate the distance
-    long duration = pulseIn(SONAR_SENSOR_ECHO, HIGH);
-    return duration * 0.034 / 2; // Convert duration to distance in cm by using the speed of sound (0.034 cm per microsecond)
-    // This does not convert to actual centimeters because of hardware compatibility issues or some other factors
+    // Read the distance 3 times
+    for (int i = 0; i < 3; i++)
+    {
+        // Send a pulse to trigger the sonar sensor
+        digitalWrite(SONAR_SENSOR_TRIGGER, LOW);
+        delayMicroseconds(2);
+        digitalWrite(SONAR_SENSOR_TRIGGER, HIGH);
+        delayMicroseconds(10);
+        digitalWrite(SONAR_SENSOR_TRIGGER, LOW);
+
+        // Read the echo pin and calculate the distance
+        long duration = pulseIn(SONAR_SENSOR_ECHO, HIGH);
+        long distance = duration * 0.034 / 2; // Convert duration to distance in cm by using the speed of sound (0.034 cm per microsecond)
+
+        // Store the distance in the corresponding variable
+        if (i == 0) distance1 = distance;
+        else if (i == 1) distance2 = distance;
+        else if (i == 2) distance3 = distance;
+
+        // Small delay between readings
+        delay(1);
+    }
+
+    // Check if the distances are the same
+    if (distance1 == distance2 && distance2 == distance3)
+    {
+        return distance1; // Return the distance if all 3 readings are the same
+    }
+    else
+    {
+        return -1; // Return -1 if the readings are not consistent
+    }
 }
 
 // Drive with calibration
