@@ -1,5 +1,8 @@
 #include <Arduino.h>
-#include <Adafruit_NeoPixel.h>
+#include <declare.cpp>
+#include <drive.cpp>
+#include <sonarSensor.cpp>
+#include <bluetooth.cpp>
 
 // Define pins
 const int       BLUETOOTH_TRANSMIT= 1;
@@ -53,8 +56,7 @@ void setup()
 
 void loop()
 {
-    unsigned long currentMillis = millis();
-
+    
 }
 
 long readSonarSensor()
@@ -63,7 +65,7 @@ long readSonarSensor()
     long distance2 = 0;
     long distance3 = 0;
 
-    // Read the distance 3 times
+    // Read the distance 3 times with delays between readings
     for (int i = 0; i < 3; i++)
     {
         // Send a pulse to trigger the sonar sensor
@@ -83,9 +85,8 @@ long readSonarSensor()
         else if (i == 2) distance3 = distance;
 
         // Small delay between readings
-        delay(1);
+        delay(50);
     }
-
     // Check if the distances are the same
     if (distance1 == distance2 && distance2 == distance3)
     {
