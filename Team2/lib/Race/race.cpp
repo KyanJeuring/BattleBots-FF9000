@@ -18,7 +18,6 @@ void setup()
 
     // Initialize the input and outputs
     pinMode(BLUETOOTH_TRANSMIT, OUTPUT);
-    pinMode(BLUETOOTH_RECEIVE, INPUT);
     pinMode(NEOPIXEL_PIN, OUTPUT);
     pinMode(MOTOR_A_BACKWARD, OUTPUT);
     pinMode(MOTOR_A_FORWARD, OUTPUT);
