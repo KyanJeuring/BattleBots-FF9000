@@ -3,7 +3,7 @@
 // Define pins
 const int       BLUETOOTH_TRANSMIT= 1;
 const int       MOTOR_A_BACKWARD = 10;
-const int       MOTOR_A_FORWARD = 9;
+const int       MOTOR_A_FORWARD = 3;
 const int       MOTOR_B_FORWARD = 6;
 const int       MOTOR_B_BACKWARD = 5;
 const int       SONAR_SENSOR_ECHO = 8;

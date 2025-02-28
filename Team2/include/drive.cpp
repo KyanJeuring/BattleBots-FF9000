@@ -15,50 +15,30 @@ void drive(int motorAForward, int motorABackward, int motorBForward, int motorBB
 
 void driveForward()
 {
-    NeoPixel.setPixelColor(PIXEL_TOP_LEFT, 0, 255, 0);
-    NeoPixel.setPixelColor(PIXEL_TOP_RIGHT, 0, 255, 0);
-    NeoPixel.setPixelColor(PIXEL_BOTTOM_LEFT, 0, 0, 0);
-    NeoPixel.setPixelColor(PIXEL_BOTTOM_RIGHT, 0, 0, 0);
-    NeoPixel.show();
+    setDriveForwardColor();
     drive(255, 0, 255, 0);
 }
 
 void driveBackward()
 {
-    NeoPixel.setPixelColor(PIXEL_TOP_LEFT, 0, 0, 0);
-    NeoPixel.setPixelColor(PIXEL_TOP_RIGHT, 0, 0, 0);
-    NeoPixel.setPixelColor(PIXEL_BOTTOM_LEFT, 255, 0, 0);
-    NeoPixel.setPixelColor(PIXEL_BOTTOM_RIGHT, 255, 0, 0);
-    NeoPixel.show();
+    setDriveBackwardColor();
     drive(0, 255, 0, 255);
 }
 
 void turnRight()
 {
-    NeoPixel.setPixelColor(PIXEL_TOP_LEFT, 0, 0, 0);
-    NeoPixel.setPixelColor(PIXEL_TOP_RIGHT, 255, 100, 0);
-    NeoPixel.setPixelColor(PIXEL_BOTTOM_LEFT, 0, 0, 0);
-    NeoPixel.setPixelColor(PIXEL_BOTTOM_RIGHT, 255, 100, 0);
-    NeoPixel.show();
+    setTurnRightColor();
     drive(0, 255, 255, 0);
 }
 
 void turnLeft()
 {
-    NeoPixel.setPixelColor(PIXEL_TOP_LEFT, 255, 100, 0);
-    NeoPixel.setPixelColor(PIXEL_TOP_RIGHT, 0, 0, 0);
-    NeoPixel.setPixelColor(PIXEL_BOTTOM_LEFT, 255, 100, 0);
-    NeoPixel.setPixelColor(PIXEL_BOTTOM_RIGHT, 0, 0, 0);
-    NeoPixel.show();
+    setTurnLeftColor();
     drive(255, 0, 0, 255);
 }
 
 void driveStop()
 {
-    NeoPixel.setPixelColor(PIXEL_TOP_LEFT, 255, 0, 0);
-    NeoPixel.setPixelColor(PIXEL_TOP_RIGHT, 255, 0, 0);
-    NeoPixel.setPixelColor(PIXEL_BOTTOM_LEFT, 255, 0, 0);
-    NeoPixel.setPixelColor(PIXEL_BOTTOM_RIGHT, 255, 0, 0);
-    NeoPixel.show();
+    setDriveStopColor();
     drive(0, 0, 0, 0);
 }

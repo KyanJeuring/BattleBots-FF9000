@@ -3,11 +3,6 @@
 #include <drive.cpp>
 #include <sonarSensor.cpp>
 
-// Define state variables for the millis
-unsigned long   _lastTime = 0;
-unsigned long   _startMillis = 0;
-bool            _avoidObject = false;
-
 void setup()
 {
     // Initialize serial communication

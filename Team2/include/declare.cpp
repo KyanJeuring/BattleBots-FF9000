@@ -1,10 +1,12 @@
 #include <Adafruit_NeoPixel.h>
+#include <servo.h>
 
 // Define pins
 const int           BLUETOOTH_TRANSMIT= 1;
 const int           NEOPIXEL_PIN = 4;
-const int           MOTOR_A_BACKWARD = 10;
-const int           MOTOR_A_FORWARD = 9;
+const int           SERVO_PIN = 9;
+const int           MOTOR_A_BACKWARD = 11;
+const int           MOTOR_A_FORWARD = 3;
 const int           MOTOR_B_FORWARD = 6;
 const int           MOTOR_B_BACKWARD = 5;
 const int           SONAR_SENSOR_ECHO = 8;
@@ -18,6 +20,10 @@ const int           PIXEL_BOTTOM_RIGHT = 1;
 const int           PIXEL_TOP_RIGHT = 2;
 const int           PIXEL_TOP_LEFT = 3;
 Adafruit_NeoPixel   NeoPixel = Adafruit_NeoPixel(NUM_PIXELS, NEOPIXEL_PIN, NEO_RGB + NEO_KHZ800);
+
+// Define servo (Gripper)
+Servo myServo;
+bool                _isGripperOpen = true;
 
 // Calibration offsets
 const int           CALIBRATION_OFFSET_A = 10; // Adjust this value as needed
