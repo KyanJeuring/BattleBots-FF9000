@@ -63,9 +63,9 @@ void setStandByColor()
 
 void setGripperActionColor()
 {
-    NeoPixel.setPixelColor(PIXEL_TOP_LEFT, 255, 85, 0);
-    NeoPixel.setPixelColor(PIXEL_TOP_RIGHT, 255, 85, 0);
-    NeoPixel.setPixelColor(PIXEL_BOTTOM_LEFT, 255, 85, 0);
-    NeoPixel.setPixelColor(PIXEL_BOTTOM_RIGHT, 255, 85, 0);
+    NeoPixel.setPixelColor(PIXEL_TOP_LEFT, 100, 0, 255);
+    NeoPixel.setPixelColor(PIXEL_TOP_RIGHT, 100, 0, 255);
+    NeoPixel.setPixelColor(PIXEL_BOTTOM_LEFT, 100, 0, 255);
+    NeoPixel.setPixelColor(PIXEL_BOTTOM_RIGHT, 100, 0, 255);
     NeoPixel.show();
 }

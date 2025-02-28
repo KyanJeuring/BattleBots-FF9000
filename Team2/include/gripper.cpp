@@ -1,11 +1,19 @@
 void openGripper()
 {
     setGripperActionColor();
-    myServo.write(122);   // Move to open position
+    gripper.write(122);   // Move to open position
 }
 
 void closeGripper()
 {
     setGripperActionColor();
-    myServo.write(42);    // Move to closed position
+    gripper.write(42);    // Move to closed position
+}
+
+void gripperSetup()
+{
+    if (gripper.read() < 122)
+    {
+        openGripper();
+    }
 }

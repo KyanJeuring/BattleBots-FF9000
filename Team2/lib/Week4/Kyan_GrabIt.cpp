@@ -34,13 +34,17 @@ void setup()
 
 void loop()
 {
-    static unsigned long _lastTime = 0;
     unsigned long currentMillis = millis();
 
-    if (currentMillis - _lastTime >= 1000 && currentMillis - _lastTime < 1300)
+    if (currentMillis - _lastTime < 1000)
+    {
+        gripperSetup();
+    }
+    else if (currentMillis - _lastTime >= 1000 && currentMillis - _lastTime < 1300)
     {
         Serial.println("Close gripper");
         closeGripper();
+        _isGripperOpen = false;
     }
     else if (currentMillis - _lastTime >= 1300 && currentMillis - _lastTime < 2300)
     {
@@ -71,6 +75,7 @@ void loop()
     {
         Serial.println("Open gripper");
         openGripper();
+        _isGripperOpen = true;
     }
     else if (currentMillis - _lastTime >= 6600)
     {
