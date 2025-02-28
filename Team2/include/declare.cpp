@@ -2,7 +2,6 @@
 
 // Define pins
 const int           BLUETOOTH_TRANSMIT= 1;
-const int           BLUETOOTH_RECEIVE = 0;
 const int           NEOPIXEL_PIN = 4;
 const int           MOTOR_A_BACKWARD = 10;
 const int           MOTOR_A_FORWARD = 9;

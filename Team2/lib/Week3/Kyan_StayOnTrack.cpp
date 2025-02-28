@@ -2,7 +2,6 @@
 #include <declare.cpp>
 #include <drive.cpp>
 #include <sonarSensor.cpp>
-#include <bluetooth.cpp>
 
 // Define pins
 const int       BLUETOOTH_TRANSMIT= 1;

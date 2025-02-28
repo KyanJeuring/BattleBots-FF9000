@@ -2,7 +2,6 @@
 #include <declare.cpp>
 #include <drive.cpp>
 #include <sonarSensor.cpp>
-#include <bluetooth.cpp>
 
 void setup()
 {
@@ -14,7 +13,6 @@ void setup()
 
     // Initialize the input and outputs
     pinMode(BLUETOOTH_TRANSMIT, OUTPUT);
-    pinMode(BLUETOOTH_RECEIVE, INPUT);
     pinMode(NEOPIXEL_PIN, OUTPUT);
     pinMode(MOTOR_A_BACKWARD, OUTPUT);
     pinMode(MOTOR_A_FORWARD, OUTPUT);
@@ -33,7 +31,6 @@ void setup()
 void loop()
 {
     unsigned long   currentMillis = millis();
-    readBluetooth();
 
     if (_avoidObject && currentMillis - _startMillis >= 1000)
     {
