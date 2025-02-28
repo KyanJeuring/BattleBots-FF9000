@@ -37,42 +37,42 @@ void loop()
     static unsigned long _lastTime = 0;
     unsigned long currentMillis = millis();
 
-    if (currentMillis - _lastTime >= 300 && currentMillis - _lastTime < 600)
+    if (currentMillis - _lastTime >= 1000 && currentMillis - _lastTime < 1300)
     {
         Serial.println("Close gripper");
         closeGripper();
     }
-    else if (currentMillis - _lastTime >= 600 && currentMillis - _lastTime < 900)
+    else if (currentMillis - _lastTime >= 1300 && currentMillis - _lastTime < 2300)
     {
         Serial.println("Drive forward");
         driveForward();
     }
-    else if (currentMillis - _lastTime >= 900 && currentMillis - _lastTime < 1900)
+    else if (currentMillis - _lastTime >= 2300 && currentMillis - _lastTime < 3300)
     {
         Serial.println("Turn right");
         turnRight();
     }
-    else if (currentMillis - _lastTime >= 1900 && currentMillis - _lastTime < 2900)
+    else if (currentMillis - _lastTime >= 3300 && currentMillis - _lastTime < 4300)
     {
         Serial.println("Turn left");
         turnLeft();
     }
-    else if (currentMillis - _lastTime >= 2900 && currentMillis - _lastTime < 4900)
+    else if (currentMillis - _lastTime >= 4300 && currentMillis - _lastTime < 5300)
     {
         Serial.println("Drive backward");
         driveBackward();
     }
-    else if (currentMillis - _lastTime >= 4900 && currentMillis - _lastTime < 5200)
+    else if (currentMillis - _lastTime >= 5300 && currentMillis - _lastTime < 6300)
     {
         Serial.println("Stop");
         driveStop();
     }
-    else if (currentMillis - _lastTime >= 5200 && currentMillis - _lastTime < 5500)
+    else if (currentMillis - _lastTime >= 6300 && currentMillis - _lastTime < 6600)
     {
         Serial.println("Open gripper");
         openGripper();
     }
-    else if (currentMillis - _lastTime >= 5500)
+    else if (currentMillis - _lastTime >= 6600)
     {
         Serial.println("Reset");
         setStandByColor();
