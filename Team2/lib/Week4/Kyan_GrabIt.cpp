@@ -12,8 +12,6 @@ void setup()
 
     // Initialize the NeoPixel
     NeoPixel.begin();
-
-    myServo.attach(SERVO_PIN);  // Attach the servo to the defined pin
     
     // Initialize the input and outputs
     pinMode(BLUETOOTH_TRANSMIT, OUTPUT);
@@ -44,7 +42,6 @@ void loop()
     {
         Serial.println("Close gripper");
         closeGripper();
-        _isGripperOpen = false;
     }
     else if (currentMillis - _lastTime >= 1300 && currentMillis - _lastTime < 2300)
     {
@@ -75,7 +72,6 @@ void loop()
     {
         Serial.println("Open gripper");
         openGripper();
-        _isGripperOpen = true;
     }
     else if (currentMillis - _lastTime >= 6600)
     {
