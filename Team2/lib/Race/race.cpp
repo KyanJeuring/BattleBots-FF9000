@@ -2,7 +2,6 @@
 #include <declare.cpp>
 #include <drive.cpp>
 #include <sonarSensor.cpp>
-#include <bluetooth.cpp>
 
 // Define state variables for the millis
 unsigned long   _lastTime = 0;
@@ -38,7 +37,6 @@ void setup()
 void loop()
 {
     unsigned long   currentMillis = millis();
-    readBluetooth();
 
     if (_avoidObject && currentMillis - _startMillis >= 1000)
     {
