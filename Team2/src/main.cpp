@@ -12,12 +12,11 @@ void setup()
 
     // Initialize the NeoPixel
     NeoPixel.begin();
-
-    gripper.attach(GRIPPER);  // Attach the servo to the defined pin
     
     // Initialize the input and outputs
     pinMode(BLUETOOTH_TRANSMIT, OUTPUT);
     pinMode(NEOPIXEL_PIN, OUTPUT);
+    pinMode(GRIPPER, OUTPUT);
     pinMode(MOTOR_A_BACKWARD, OUTPUT);
     pinMode(MOTOR_A_FORWARD, OUTPUT);
     pinMode(MOTOR_B_FORWARD, OUTPUT);
