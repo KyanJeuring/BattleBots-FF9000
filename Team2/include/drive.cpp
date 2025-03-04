@@ -7,6 +7,7 @@ int calibrate(int n, int offset)
 
 void drive(int motorAForward, int motorABackward, int motorBForward, int motorBBackward)
 {
+    setDriveForwardColor();
     analogWrite(MOTOR_A_FORWARD, calibrate(motorAForward, CALIBRATION_OFFSET_A));
     analogWrite(MOTOR_A_BACKWARD, calibrate(motorABackward, CALIBRATION_OFFSET_A));
     analogWrite(MOTOR_B_FORWARD, calibrate(motorBForward, CALIBRATION_OFFSET_B));

@@ -21,13 +21,11 @@ void gripper(int pulse)
 
 void openGripper()
 {
-    setGripperActionColor();
     gripper(GRIPPER_OPEN);
 }
 
 void closeGripper()
 {
-    setGripperActionColor();
     gripper(GRIPPER_CLOSE);
 }
 

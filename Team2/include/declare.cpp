@@ -12,6 +12,12 @@ const int           SONAR_SENSOR_ECHO = 8;
 const int           SONAR_SENSOR_TRIGGER = 7;
 const int           LINE_SENSORS[] = {A0, A1, A2, A3, A4, A5, A6, A7};
 
+// PID Constants
+float Kp = 0.5; // Determines correction strength
+float Kd = 0.01; // Helps reduce shaking
+int baseSpeed = 250; // Default speed of the motors
+int lastError = 0; // Stores previous error for derivative calculation
+
 // Define NeoPixel
 const int           NUM_PIXELS = 4;
 const int           PIXEL_BOTTOM_LEFT = 0;
