@@ -4,10 +4,12 @@
 const int           BLUETOOTH_TRANSMIT= 1;
 const int           NEOPIXEL_PIN = 4;
 const int           GRIPPER = 9;
-const int           MOTOR_A_BACKWARD = 11;
-const int           MOTOR_A_FORWARD = 10;
-const int           MOTOR_B_FORWARD = 6;
-const int           MOTOR_B_BACKWARD = 5;
+const int           MOTOR_A_BACKWARD = 11; // Right motor backward
+const int           MOTOR_A_FORWARD = 10; // Right motor forward
+const int           MOTOR_B_FORWARD = 6; // Left motor forward
+const int           MOTOR_B_BACKWARD = 5; // Left motor backward
+const int           MOTOR_R1 = 2; // Motor A (Right) rotation sensor
+const int           MOTOR_R2 = 3; // Motor B (Left) rotation sensor;
 const int           SONAR_SENSOR_ECHO = 8;
 const int           SONAR_SENSOR_TRIGGER = 7;
 const int           LINE_SENSORS[] = {A0, A1, A2, A3, A4, A5, A6, A7};

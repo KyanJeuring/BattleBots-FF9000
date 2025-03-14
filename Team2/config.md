@@ -33,6 +33,10 @@ P6 -> B1 (Motor B [Left] Forward)
 
 P5 -> B2 (Motor B [Left] Backwards)
 
+P2 -> R1 (Motor A rotation sensor)
+
+p3 -> R2 (Motor B rotation sensor)
+
 ## Hardcoded Calibration Values
 
 Motor A -> 10
