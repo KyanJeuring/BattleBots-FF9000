@@ -3,6 +3,7 @@ class DistanceSensor
   private:
     int trigPin;
     int echoPin;
+    const int maxDistance = 100; //set to -1 if you want no max Distance
 
     // gets raw data from the sensor
     float getPulseDuration()
@@ -13,15 +14,24 @@ class DistanceSensor
       digitalWrite(trigPin, HIGH);
       delayMicroseconds(10);
       digitalWrite(trigPin, LOW);
-
-      return pulseIn(echoPin, HIGH);
+      if(maxDistance == -1)
+      {
+        return pulseIn(echoPin, HIGH);
+      }else{
+      return pulseIn(echoPin, HIGH, 60 * maxDistance); //24000 is for about 400cm, so if you want a limit of one meter just set it to 6000
+      }
     }
 
     // gets the distance measured by the sensor
     float getProcessedDistance()
     {
       float pulseDuration = getPulseDuration();
-      float distance = (pulseDuration * .0343) / 2;
+      float distance;
+      if(pulseDuration > 100){
+        distance = (pulseDuration * .0343) / 2;
+      }else{
+        distance = maxDistance;
+      }
       return distance;
     }
 
