@@ -43,6 +43,15 @@ void setTurnLeftColor()
     NeoPixel.show();
 }
 
+void setTurnAroundColor()
+{
+    NeoPixel.setPixelColor(PIXEL_TOP_LEFT, 255, 100, 0);
+    NeoPixel.setPixelColor(PIXEL_TOP_RIGHT, 255, 100, 0);
+    NeoPixel.setPixelColor(PIXEL_BOTTOM_LEFT, 255, 100, 0);
+    NeoPixel.setPixelColor(PIXEL_BOTTOM_RIGHT, 255, 100, 0);
+    NeoPixel.show();
+}
+
 void setDriveStopColor()
 {
     NeoPixel.setPixelColor(PIXEL_TOP_LEFT, 255, 0, 0);
