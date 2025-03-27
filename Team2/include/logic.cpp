@@ -33,9 +33,15 @@ void endGame()
         // Stop the robot
         stopMotors();
 
-        // Open gripper to drop the cone
+        // Open gripper to drop the cone and move backward
         conePickedUp = false;
-        moveBackward(200, 200);
+        unsigned long startTime = millis();
+        while (millis() - startTime < 200)
+        {
+            setDriveBackwardColor();
+            moveBackward(200, 200);
+        }
+        stopMotors();
 
         // Set flags to indicate game is over
         coneDroppedOff = true;

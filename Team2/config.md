@@ -1,10 +1,18 @@
-## Buttons (Optional)
 
-P2 -> Button 1
 
-P3 -> Button 2
+## Motors
 
-P4 -> Button 3
+P10 -> A1 (Motor A [Right] Forwards)
+
+P9 -> A2 (Motor A [Right] Backwards)
+
+P6 -> B1 (Motor B [Left] Forwards)
+
+P5 -> B2 (Motor B [Left] Backwards)
+
+P2 -> R1 (Motor A rotation sensor)
+
+p3 -> R2 (Motor B rotation sensor)
 
 ## Gripper
 
@@ -14,7 +22,7 @@ P11 -> Gr (Gripper)
 
 P4 -> NO -> NeoPixel (Output)
 
-## Sonar Sensor (Optional)
+## Sonar Sensor
 P7 -> Trig
 P8 -> Echo
 
@@ -22,23 +30,6 @@ P8 -> Echo
 Minimum = 1
 Maximum = 1193
 
-
-## Motors
-
-P10 -> A1 (Motor A [Right] Backwards)
-
-P9 -> A2 (Motor A [Right] Forward)
-
-P6 -> B1 (Motor B [Left] Forward)
-
-P5 -> B2 (Motor B [Left] Backwards)
-
-P2 -> R1 (Motor A rotation sensor)
-
-p3 -> R2 (Motor B rotation sensor)
-
-## Hardcoded Calibration Values
-
-Motor A -> 10
-
-Motor B -> 5
+## Line Sensor Range
+Minimum = 0
+Maximum = 1023

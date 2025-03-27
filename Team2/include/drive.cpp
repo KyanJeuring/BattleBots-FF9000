@@ -20,18 +20,18 @@ void rightEncoderISR()
 
 void stopMotors()
 {
-    analogWrite(MOTOR_A_1, 0);
-    analogWrite(MOTOR_A_2, 0);
-    analogWrite(MOTOR_B_1, 0);
-    analogWrite(MOTOR_B_2, 0);
+    analogWrite(MOTOR_B_FORWARD, 0);
+    analogWrite(MOTOR_B_BACKWARD, 0);
+    analogWrite(MOTOR_A_FORWARD, 0);
+    analogWrite(MOTOR_A_BACKWARD, 0);
 }
 
 void moveForward(int _leftSpeed, int _rightSpeed)
 {
     if (!gameEnded)
     {
-        analogWrite(MOTOR_A_1, _leftSpeed);
-        analogWrite(MOTOR_B_1, _rightSpeed);
+        analogWrite(MOTOR_B_FORWARD, _leftSpeed);
+        analogWrite(MOTOR_A_FORWARD, _rightSpeed);
     }
 }
 
@@ -39,17 +39,17 @@ void moveBackward(int _leftSpeed, int _rightSpeed)
 {
     if (!gameEnded)
     {
-        analogWrite(MOTOR_A_2, _leftSpeed);
-        analogWrite(MOTOR_B_2, _rightSpeed);
+        analogWrite(MOTOR_B_BACKWARD, _leftSpeed);
+        analogWrite(MOTOR_A_BACKWARD, _rightSpeed);
     }
 }
 
 void turn180(int _leftSpeed, int _rightSpeed)
 {
-    analogWrite(MOTOR_A_2, 0);
-    analogWrite(MOTOR_B_1, 0);
-    analogWrite(MOTOR_A_1, _leftSpeed);
-    analogWrite(MOTOR_B_2, _rightSpeed);
+    analogWrite(MOTOR_B_BACKWARD, 0);
+    analogWrite(MOTOR_A_FORWARD, 0);
+    analogWrite(MOTOR_B_FORWARD, _leftSpeed);
+    analogWrite(MOTOR_A_BACKWARD, _rightSpeed);
 }
 
 void turnLeftMillis(int angle)
