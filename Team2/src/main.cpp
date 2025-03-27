@@ -4,56 +4,91 @@
 #include <gripper.cpp>
 #include <lineSensor.cpp>
 #include <drive.cpp>
+#include <logic.cpp>
 #include <lineSensorCalibration.cpp>
-#include <pathChecker.cpp>
 
 void setup()
 {
     Serial.begin(9600);
-    NeoPixel.begin();
+    NeoPixel.show();
     NeoPixel.setBrightness(50);
 
     // Set Motor Pins
-    pinMode(MOTOR_B_FORWARD, OUTPUT);
-    digitalWrite(MOTOR_B_FORWARD, LOW);
-    pinMode(MOTOR_A_BACKWARD, OUTPUT);
-    pinMode(MOTOR_A_FORWARD, OUTPUT);
-    pinMode(MOTOR_B_BACKWARD, OUTPUT);
-
-    digitalWrite(MOTOR_A_BACKWARD, LOW);
-    digitalWrite(MOTOR_A_FORWARD, LOW);
-    digitalWrite(MOTOR_B_BACKWARD, LOW);
+    pinMode(MOTOR_A_1, OUTPUT);
+    pinMode(MOTOR_A_2, OUTPUT);
+    pinMode(MOTOR_B_1, OUTPUT);
+    pinMode(MOTOR_B_2, OUTPUT);
+    digitalWrite(MOTOR_A_1, LOW);
+    digitalWrite(MOTOR_A_2, LOW);
+    digitalWrite(MOTOR_B_1, LOW);
+    digitalWrite(MOTOR_B_2, LOW);
+    pinMode(TRIG, OUTPUT);
+    pinMode(ECHO, INPUT);
 
     // Attach Interrupts for Encoders
     attachInterrupt(digitalPinToInterrupt(MOTOR_R1), leftEncoderISR, CHANGE);
     attachInterrupt(digitalPinToInterrupt(MOTOR_R2), rightEncoderISR, CHANGE);
 
-    // Set Line Sensor Pins
-    declareLineSensorPins();
-
-    // SERVO
+    //SERVO
     pinMode(SERVO, OUTPUT);
     digitalWrite(SERVO, LOW);
 }
 
 void loop()
 {
-    unsigned int currentTime = millis();
-    if (currentTime - previousTime >= gripperInterval)
+    // put your main code here, to run repeatedly:
+    int unsigned currentTime = millis();
+    if (gameEnded)
     {
-        previousTime = currentTime;
-        conePickedUp ? closeGripper() : openGripper();
+        setDriveStopColor();
+
+        if (currentTime - previousTime >= gripperInterval)
+        {
+            previousTime = currentTime;
+            gripper(GRIPPER_OPEN);  // Keep the gripper open to drop the cone
+        }
+        return;  // Skip the rest of the loop
+    }
+
+    // Check for obstacles (only when following line, not during turns)
+    if (robotState == FOLLOW_LINE && gameStarted && !gameEnded)
+    {
+        float distance = measureDistance();
+
+        // If obstacle detected within 12cm, turn around
+        if (distance < 12)
+        {
+            turnAroundMillis();
+            return;  // Skip the rest of the loop to start turning
+        }
+    }
+
+    if (conePickedUp)
+    {
+        if (currentTime - previousTime >= gripperInterval)
+        {
+            previousTime = currentTime;
+            gripper(GRIPPER_CLOSE);
+        }
+    }
+    else
+    {
+        if (currentTime - previousTime >= gripperInterval)
+        {
+            previousTime = currentTime;
+            gripper(GRIPPER_OPEN);
+        }
     }
 
     if (coneInSquare && !sensorsCalibrated)
     {
-        // calibrateSensors
+        //calibrateSensors
         calibrateSensors();
     }
 
     if (sensorsCalibrated && !conePickedUp)
     {
-        // pickUpCone
+        //pickUpCone
         conePickedUp = true;
         return;
     }
@@ -61,62 +96,43 @@ void loop()
     if (sensorsCalibrated && !gameStarted && conePickedUp)
     {
         turnLeftMillis(90);
-        if (robotState != FOLLOW_LINE)
-            return;
+        if (robotState != FOLLOW_LINE) return;
         gameStarted = true;
     }
 
     if (gameStarted && !gameEnded)
     {
         getLinePosition();
-        Serial.print("Robotstate: ");
-        Serial.println(robotState);
-        Serial.print("LinePosition: ");
-        Serial.println(linePosition);
 
-        if (linePosition != CENTER_LINE)
+        switch (linePosition)
         {
-            // checkPathAhead();
-            // if(!pathChecked) return;
-            if (linePosition == T_JUNCTION)
-            {
+            case T_JUNCTION:
                 turnLeftMillis(90);
-                Serial.println(robotState);
-                Serial.println("TURNING_LEFT2");
-                setTurnLeftColor();
-            }
-            else if (linePosition == LEFT_LINE)
-            {
-                turnLeftMillis(70);
-                Serial.println(robotState);
-                Serial.println("TURNING_LEFT");
-                setTurnLeftColor();
-            }
-            else if (linePosition == NO_LINE)
-            {
-                turnAroundMillis();
-                Serial.println(robotState);
-                Serial.println("TURNING_AROUND");
-                setTurnAroundColor();
-            }
-            else if (linePosition == RIGHT_LINE)
-            {
-                linePosition == CENTER_LINE;
-                robotState = FOLLOW_LINE;
-                // turnRightMillis(90);
-                moveForwardPID(baseSpeed, baseSpeed, false, true);
-                Serial.println(robotState);
-                Serial.println("TURNING_RIGHT");
-                setTurnRightColor();
-            }
-        }
+                break;
 
-        if (linePosition == CENTER_LINE)
-        {
-            moveForwardPID(baseSpeed, baseSpeed, false, true);
-            Serial.println(robotState);
-            Serial.println("FollowLine");
-            setDriveForwardColor();
+            case LEFT_LINE:
+                turnLeftMillis(70);
+                break;
+
+            case NO_LINE:
+                turnAroundMillis();
+                break;
+
+            case RIGHT_LINE:
+                robotState = FOLLOW_LINE;
+                moveForwardPID(baseSpeed, baseSpeed, false, true);
+                break;
+
+            case CENTER_LINE:
+                if (robotState == FOLLOW_LINE)
+                {
+                    moveForwardPID(baseSpeed, baseSpeed, false, true);
+                }
+                break;
+
+            default:
+                // Handle unexpected line positions, if necessary
+                break;
         }
     }
 }

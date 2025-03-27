@@ -8,7 +8,7 @@ P4 -> Button 3
 
 ## Gripper
 
-P12 -> Gr (Gripper)
+P11 -> Gr (Gripper)
 
 ## NeoPixels
 
@@ -25,9 +25,9 @@ Maximum = 1193
 
 ## Motors
 
-P11 -> A1 (Motor A [Right] Backwards)
+P10 -> A1 (Motor A [Right] Backwards)
 
-P10 -> A2 (Motor A [Right] Forward)
+P9 -> A2 (Motor A [Right] Forward)
 
 P6 -> B1 (Motor B [Left] Forward)
 
