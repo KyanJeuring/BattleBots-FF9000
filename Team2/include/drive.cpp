@@ -157,11 +157,9 @@ void moveForwardPID(int _leftSpeed, int _rightSpeed, bool withOutLine, bool line
 {
     if (withOutLine)
     {
-        // Lower these values
-        // FIXED VALUES
-        Kp = 1.0;   // Reduced from 6.5
-        Ki = 0.01;  // Reduced from 0.1
-        Kd = 1.0;   // Reduced from 5
+        Kp = 1.0;   // Proportional Gain
+        Ki = 0.01;  // Integral Gain
+        Kd = 1.0;   // Derivative Gain
 
         // Calculate error
         error = _leftTicks - _rightTicks;

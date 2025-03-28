@@ -38,8 +38,9 @@ void setup()
 
 void loop()
 {
-    // put your main code here, to run repeatedly:
+    // 
     int unsigned currentTime = millis();
+    // Check if the game has ended
     if (gameEnded)
     {
 
@@ -64,6 +65,7 @@ void loop()
         }
     }
 
+    // Check if the gripper should be opened or closed based on the conePickUp state
     if (conePickedUp)
     {
         if (currentTime - previousTime >= GRIPPER_INTERVAL)
@@ -81,9 +83,10 @@ void loop()
         }
     }
 
+    // Check if the cone is in the square and if the robot is not calibrated
     if (coneInSquare && !sensorsCalibrated)
     {
-        //calibrateSensors
+        // Start calibrating the line sensors when a robot is detected
         if (measureDistance() < 30)
         {
             robotDetected = true;
@@ -95,6 +98,7 @@ void loop()
         return;  // Skip the rest of the loop to allow for calibration
     }
 
+    // Check if the sensors are calibrated and if the cone is not picked up
     if (sensorsCalibrated && !conePickedUp)
     {
         //pickUpCone
@@ -102,15 +106,19 @@ void loop()
         return;
     }
 
+    // Check if the sensors are calibrated and if the game has not started yet
     if (sensorsCalibrated && !gameStarted && conePickedUp)
     {
+        // Start the game by turning left for 90 milliseconds
         turnLeftMillis(90);
-        if (robotState != FOLLOW_LINE) return;
+        if (robotState != FOLLOW_LINE) return; // Ensure the robot is in the FOLLOW_LINE state before proceeding
         gameStarted = true;
     }
 
+    // Check if the game has started and if the game has not ended yet
     if (gameStarted && !gameEnded)
     {
+        // Get the line position and take action based on it
         getLinePosition();
 
         switch (linePosition)

@@ -68,7 +68,7 @@ void setDriveStopColor()
     NeoPixel.show();
 }
 
-void setStandByColor()
+void setCalibrateColor()
 {
     NeoPixel.clear();
     NeoPixel.setPixelColor(PIXEL_TOP_LEFT, 0, 85, 90);

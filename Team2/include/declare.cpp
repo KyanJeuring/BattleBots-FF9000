@@ -34,11 +34,6 @@ const int                   ECHO = 8;
 volatile signed int         _leftTicks = 0;
 volatile signed int         _rightTicks = 0;
 
-const int                   LED_NO = 8;    // DATA OUT
-const int                   LED_NI = 4;    // DATA IN
-const int                   NUM_LEDS = 4;  // Number of LEDs in strip
-// Add at the top of the file
-
 // Define NeoPixel
 const int                   NEOPIXEL_PIN = 4;
 const int                   NUM_PIXELS = 4;
@@ -77,21 +72,21 @@ bool                        coneDroppedOff = false;
 bool                        gameEnded = false;
 bool                        motionComplete = true;
 bool                        robotDetected = false;
-
-// Add to the existing definitions
 bool                        blackSquareDetected = false;
+
+// Setup the minimum time to confirm a black square
 const int                   MIN_SQUARE_TIME = 2000;  // Minimum time in ms to confirm we're on a black square
 
+// PID Variables
 int                         error = 0, lastError = 0;
 float                       integral = 0;
 float                       derivative = 0;
-
-//PID
 float                       Kp;  // Proportional Gain
 float                       Ki;  // Integral Gain
 float                       Kd;  // Derivative Gain
 int                         correction;
 
+// Robot variables
 int                         pulses;
 int                         angle;
 int                         radius = DISTANCE_BETWEEN_WHEELS;

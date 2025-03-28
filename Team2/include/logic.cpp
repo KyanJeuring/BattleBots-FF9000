@@ -11,10 +11,10 @@ float measureDistance()
     digitalWrite(TRIG, LOW);
 
     // Read the ECHO pin, returns the sound wave travel time in microseconds
-    long duration = pulseIn(ECHO, HIGH, 30000);  // Timeout after 30ms (approx 5m range)
+    long duration = pulseIn(ECHO, HIGH, 30000);  // Timeout after 30ms
 
     // Calculate the distance
-    float distance = duration * 0.034 / 2;  // Speed of sound wave divided by 2 (go and back)
+    float distance = duration * 0.034 / 2;  // Speed of sound wave divided by 2 due to the echo
 
     // Filter out unreliable readings
     if (distance == 0 || distance > 200)
@@ -35,18 +35,14 @@ void endGame()
         int startTime = millis();
         while (millis() < startTime + 1000)
         {
-            openGripper(); //conePickedUp = false;
+            conePickedUp = false; // Open gripper
             setDriveBackwardColor();
             moveBackward(200, 200);  // Move backward while dropping the cone
         }
         
+        // Stop the robot after driving backwards
         stopMotors();
         setDriveStopColor();
-        
-        // Open gripper to drop the cone
-
-        // Move backward after dropping the cone
-        // unsigned long startTime = millis();
 
         // Set flags to indicate game is over
         coneDroppedOff = true;
