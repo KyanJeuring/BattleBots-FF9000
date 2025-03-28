@@ -1,5 +1,3 @@
-#include <Arduino.h>
-
 // Define pins
 const int       BLUETOOTH_TRANSMIT= 1;
 const int       MOTOR_A_BACKWARD = 10;
@@ -10,7 +8,6 @@ const int       SONAR_SENSOR_ECHO = 8;
 const int       SONAR_SENSOR_TRIGGER = 7;
 
 // Define state variables for the millis
-unsigned long   _lastTime = 0;
 unsigned long   _startMillis = 0;
 bool            _avoidObject = false;
 
@@ -19,10 +16,11 @@ const int CALIBRATION_OFFSET_A = 10; // Adjust this value as needed
 const int CALIBRATION_OFFSET_B = 5;  // Adjust this value as needed
 
 // Define the function prototype
+
+//controls motor movement by setting direction
 void drive(int motorAForward, int motorABackward, int motorBForward, int motorBBackward);
-void buttonPress();
-int calibrate(int n, int offset);
-long readSonarSensor();
+int calibrate(int n, int offset);//calibration to improve accuracy
+long readSonarSensor();//for detecting distance and rod by sensor
 
 void setup()
 {
@@ -47,15 +45,15 @@ void setup()
 
 void loop()
 {
-    unsigned long currentMillis = millis();
+    unsigned long currentMillis = millis();//records the time since start
 
-    if (_avoidObject && currentMillis - _startMillis >= 1000)
+    if (_avoidObject && currentMillis - _startMillis >= 1000)//if the bot is avoiding an object
     {
-        _avoidObject = false;
+        _avoidObject = false;//after a second stops avoidance
     }
     else if (!_avoidObject)
     {
-        long distance = readSonarSensor();
+        long distance = readSonarSensor();//check the distance for object
         if (distance < 15)
         {
             Serial.print("Obstacle detected at distance: ");
@@ -75,7 +73,7 @@ void loop()
 
             Serial.println("Go forward");
             drive(255, 0, 255, 0);
-            delay(1000);
+            delay(1200);
 
             Serial.println("Turn right");
             drive(0, 255, 255, 0);
@@ -112,6 +110,7 @@ long readSonarSensor()
     long duration = pulseIn(SONAR_SENSOR_ECHO, HIGH);
     return duration * 0.034 / 2; // Convert duration to distance in cm by using the speed of sound (0.034 cm per microsecond)
     // This does not convert to actual centimeters because of hardware compatibility issues or some other factors
+    //the duration is devided by to so it goes for the sound. First is out and the other is in. 
 }
 
 // Drive with calibration
