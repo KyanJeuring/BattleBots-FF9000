@@ -10,8 +10,10 @@
 void setup()
 {
     Serial.begin(9600);
+    NeoPixel.begin();
+    NeoPixel.clear();
     NeoPixel.show();
-    NeoPixel.setBrightness(50);
+    NeoPixel.setBrightness(40);
 
     // Set Motor Pins
     pinMode(MOTOR_B_FORWARD, OUTPUT);
@@ -40,7 +42,6 @@ void loop()
     int unsigned currentTime = millis();
     if (gameEnded)
     {
-        setDriveStopColor();
 
         if (currentTime - previousTime >= GRIPPER_INTERVAL)
         {
@@ -58,7 +59,6 @@ void loop()
         // If obstacle detected within 12cm, turn around
         if (distance < 12)
         {
-            setTurnAroundColor();
             turnAroundMillis();
             return;  // Skip the rest of the loop to start turning
         }
@@ -84,7 +84,15 @@ void loop()
     if (coneInSquare && !sensorsCalibrated)
     {
         //calibrateSensors
-        calibrateSensors();
+        if (measureDistance() < 30)
+        {
+            robotDetected = true;
+            if(robotDetected)
+            {
+                calibrateSensors();
+            }
+        }
+        return;  // Skip the rest of the loop to allow for calibration
     }
 
     if (sensorsCalibrated && !conePickedUp)
@@ -109,21 +117,17 @@ void loop()
         {
             case T_JUNCTION:
                 turnLeftMillis(90);
-                setTurnAroundColor();
                 break;
 
             case LEFT_LINE:
                 turnLeftMillis(70);
-                setTurnLeftColor();
                 break;
 
             case NO_LINE:
                 turnAroundMillis();
-                setTurnAroundColor();
                 break;
 
             case RIGHT_LINE:
-                setTurnRightColor();
                 robotState = FOLLOW_LINE;
                 moveForwardPID(baseSpeed, baseSpeed, false, true);
                 break;
@@ -131,8 +135,8 @@ void loop()
             case CENTER_LINE:
                 if (robotState == FOLLOW_LINE)
                 {
-                    setDriveForwardColor();
                     moveForwardPID(baseSpeed, baseSpeed, false, true);
+                    setDriveForwardColor();
                 }
                 break;
 
