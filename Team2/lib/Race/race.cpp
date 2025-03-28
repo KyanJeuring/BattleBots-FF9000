@@ -1,77 +1,144 @@
 #include <Arduino.h>
 #include <declare.cpp>
+#include <debugLight.cpp>
+#include <gripper.cpp>
+#include <lineSensor.cpp>
 #include <drive.cpp>
-#include <sonarSensor.cpp>
+#include <logic.cpp>
+#include <lineSensorCalibration.cpp>
 
 void setup()
 {
-    // Initialize serial communication
     Serial.begin(9600);
+    NeoPixel.show();
+    NeoPixel.setBrightness(50);
 
-    // Initialize the NeoPixel
-    NeoPixel.begin();
-
-    // Initialize the input and outputs
-    pinMode(BLUETOOTH_TRANSMIT, OUTPUT);
-    pinMode(NEOPIXEL_PIN, OUTPUT);
-    pinMode(MOTOR_A_BACKWARD, OUTPUT);
-    pinMode(MOTOR_A_FORWARD, OUTPUT);
+    // Set Motor Pins
     pinMode(MOTOR_B_FORWARD, OUTPUT);
     pinMode(MOTOR_B_BACKWARD, OUTPUT);
-    pinMode(SONAR_SENSOR_TRIGGER, OUTPUT);
-    pinMode(SONAR_SENSOR_ECHO, INPUT);
+    pinMode(MOTOR_A_FORWARD, OUTPUT);
+    pinMode(MOTOR_A_BACKWARD, OUTPUT);
+    digitalWrite(MOTOR_B_FORWARD, LOW);
+    digitalWrite(MOTOR_B_BACKWARD, LOW);
+    digitalWrite(MOTOR_A_FORWARD, LOW);
+    digitalWrite(MOTOR_A_BACKWARD, LOW);
+    pinMode(TRIG, OUTPUT);
+    pinMode(ECHO, INPUT);
 
-    // Initialize the outputs
-    digitalWrite(MOTOR_A_BACKWARD, HIGH);
-    digitalWrite(MOTOR_A_FORWARD, HIGH);
-    digitalWrite(MOTOR_B_FORWARD, HIGH);
-    digitalWrite(MOTOR_B_BACKWARD, HIGH);
+    // Attach Interrupts for Encoders
+    attachInterrupt(digitalPinToInterrupt(MOTOR_R1), leftEncoderISR, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(MOTOR_R2), rightEncoderISR, CHANGE);
+
+    //SERVO
+    pinMode(SERVO, OUTPUT);
+    digitalWrite(SERVO, LOW);
 }
 
 void loop()
 {
-    unsigned long   currentMillis = millis();
+    // put your main code here, to run repeatedly:
+    int unsigned currentTime = millis();
+    if (gameEnded)
+    {
+        setDriveStopColor();
 
-    if (_avoidObject && currentMillis - _startMillis >= 1000)
-    {
-        _avoidObject = false;
-    }
-    else if (!_avoidObject)
-    {
-        long distance = readSonarSensor();
-        if (distance < 15)
+        if (currentTime - previousTime >= GRIPPER_INTERVAL)
         {
-            Serial.print("Obstacle detected at distance: ");
-            Serial.print(distance);
-            Serial.println(". Avoiding object...");
-            Serial.println("Turning left");
-            turnLeft();
-            delay(500);
-            Serial.println("Driving forward");
-            driveForward();
-            delay(1000);
-            Serial.println("Turning right");
-            turnRight();
-            delay(500);
-            Serial.println("Driving forward");
-            driveForward();
-            delay(1000);
-            Serial.println("Turning right");
-            turnRight();
-            delay(500);
-            Serial.println("Driving forward");
-            driveForward();
-            delay(1000);
-            Serial.println("Turning left");
-            turnLeft();
-            delay(500);
-            currentMillis = millis();
-            _startMillis = currentMillis;
-            _avoidObject = true;
+            previousTime = currentTime;
+            openGripper();  // Keep the gripper open to drop the cone
         }
-        else
+        return;  // Skip the rest of the loop
+    }
+
+    // Check for obstacles (only when following line, not during turns)
+    if (robotState == FOLLOW_LINE && gameStarted && !gameEnded)
+    {
+        float distance = measureDistance();
+
+        // If obstacle detected within 12cm, turn around
+        if (distance < 12)
         {
-            driveForward();
+            setTurnAroundColor();
+            turnAroundMillis();
+            return;  // Skip the rest of the loop to start turning
+        }
+    }
+
+    if (conePickedUp)
+    {
+        if (currentTime - previousTime >= GRIPPER_INTERVAL)
+        {
+            previousTime = currentTime;
+            closeGripper();
+        }
+    }
+    else
+    {
+        if (currentTime - previousTime >= GRIPPER_INTERVAL)
+        {
+            previousTime = currentTime;
+            openGripper();
+        }
+    }
+
+    if (coneInSquare && !sensorsCalibrated)
+    {
+        //calibrateSensors
+        calibrateSensors();
+    }
+
+    if (sensorsCalibrated && !conePickedUp)
+    {
+        //pickUpCone
+        conePickedUp = true;
+        return;
+    }
+
+    if (sensorsCalibrated && !gameStarted && conePickedUp)
+    {
+        turnLeftMillis(90);
+        if (robotState != FOLLOW_LINE) return;
+        gameStarted = true;
+    }
+
+    if (gameStarted && !gameEnded)
+    {
+        getLinePosition();
+
+        switch (linePosition)
+        {
+            case T_JUNCTION:
+                turnLeftMillis(90);
+                setTurnAroundColor();
+                break;
+
+            case LEFT_LINE:
+                turnLeftMillis(70);
+                setTurnLeftColor();
+                break;
+
+            case NO_LINE:
+                turnAroundMillis();
+                setTurnAroundColor();
+                break;
+
+            case RIGHT_LINE:
+                setTurnRightColor();
+                robotState = FOLLOW_LINE;
+                moveForwardPID(baseSpeed, baseSpeed, false, true);
+                break;
+
+            case CENTER_LINE:
+                if (robotState == FOLLOW_LINE)
+                {
+                    setDriveForwardColor();
+                    moveForwardPID(baseSpeed, baseSpeed, false, true);
+                }
+                break;
+
+            default:
+                // Handle unexpected line positions, if necessary
+                break;
         }
     }
 }

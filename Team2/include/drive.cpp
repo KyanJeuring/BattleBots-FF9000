@@ -68,6 +68,7 @@ void turnLeftMillis(int angle)
         stopMotors();
 
         moveForward(0, 200);
+        setTurnLeftColor();
         robotState = TURNING_LEFT;  //Lock state to "TURNING_LEFT"
         motionComplete = false;
     }
@@ -100,6 +101,7 @@ void turnRightMillis(int angle)
         stopMotors();
 
         moveForward(200, 0);         // Right turn: left motor moves forward, right motor stops
+        setTurnRightColor();        // Set color for right turn
         robotState = TURNING_RIGHT;  // Lock state to "TURNING_RIGHT"
         motionComplete = false;
     }
@@ -132,6 +134,7 @@ void turnAroundMillis()
         targetPulses = (turnDistance / WHEEL_CIRCUMFERENCE) * PULSE_PER_REVOLUTION;
 
         turn180(200, 200);  // Left wheel moves backward, right moves forward
+        setTurnAroundColor();
 
         robotState = TURNING_AROUND;  // Lock state to "TURNING_AROUND"
         motionComplete = false;

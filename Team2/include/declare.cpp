@@ -25,7 +25,7 @@ const float                 WHEEL_CIRCUMFERENCE = 20.4;
 const int                   PULSE_PER_REVOLUTION = 20;
 const float                 DISTANCE_BETWEEN_WHEELS = 22.75;
 static const int            DISTANCE_FROM_BASE_TO_CONE = 55; // Distance is in ticks
-const int                   target = DISTANCE_FROM_BASE_TO_CONE;
+const int                   TARGET = DISTANCE_FROM_BASE_TO_CONE;
 
 const int                   TRIG = 7;
 const int                   ECHO = 8;
@@ -58,9 +58,9 @@ int                         baseSpeed = 255;
 const int                   GRIPPER_OPEN = 1800;
 const int                   GRIPPER_CLOSE = 990;
 const int                   SERVO = 11;
-const int                   pulse = 2000;
+const int                   PULSE = 2000;
 int                         previousTime = 0;
-const int                   gripperInterval = 20;
+const int                   GRIPPER_INTERVAL = 20;
 
 //Rotation Sensors
 const int                   MOTOR_R1 = 2;
@@ -76,6 +76,7 @@ bool                        gameStarted = false;
 bool                        coneDroppedOff = false;
 bool                        gameEnded = false;
 bool                        motionComplete = true;
+bool                        robotDetected = false;
 
 // Add to the existing definitions
 bool                        blackSquareDetected = false;
@@ -97,6 +98,7 @@ int                         radius = DISTANCE_BETWEEN_WHEELS;
 int                         turn_Circumference = 2 * 3.14 * radius;
 float                       turnDistances = 0;  // ARC of a circle
 
+// function to reset the encoder ticks
 void resetTicks()
 {
     _leftTicks = 0;

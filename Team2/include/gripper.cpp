@@ -34,7 +34,6 @@
 void openGripper()
 {
     gripper(GRIPPER_OPEN);
-    setGripperActionColor();
 }
 
 void closeGripper()

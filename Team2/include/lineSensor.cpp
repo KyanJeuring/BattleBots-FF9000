@@ -48,7 +48,7 @@ void getLinePosition()
         potentialBlackSquare = true;
     }
 
-    // Check if we've been on black square for at least 200ms
+    // Check if we've been on black square for at least 150ms
     if (allSensorsBlack && potentialBlackSquare && (millis() - blackSquareStartTime >= 150))
     {
         blackSquareDetected = true;
