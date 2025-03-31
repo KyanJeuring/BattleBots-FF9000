@@ -57,7 +57,7 @@ void loop()
         float distance = measureDistance();
 
         // If obstacle detected within 12cm, turn around
-        if (distance < 12)
+        if (distance < 15)
         {
             turn180(200, 200);
             return;  // Skip the rest of the loop to start turning
@@ -85,14 +85,28 @@ void loop()
     // Check if the cone is in the square and if the robot is not calibrated
     if (coneInSquare && !sensorsCalibrated)
     {
-        // Start calibrating the line sensors when a robot is detected
+        // Start calibrating the line sensors when a robot is detected for 200ms
+        static unsigned long detectionStartTime = 0;
+
         if (measureDistance() < 30)
         {
-            robotDetected = true;
-            if(robotDetected)
+            if (detectionStartTime == 0)
             {
-                calibrateSensors();
+                detectionStartTime = millis();  // Start timing
             }
+            else if (millis() - detectionStartTime >= 350)
+            {
+                robotDetected = true;
+                if (robotDetected)
+                {
+                    calibrateSensors();
+                }
+                detectionStartTime = 0;  // Reset the timer after calibration
+            }
+        }
+        else
+        {
+            detectionStartTime = 0;  // Reset the timer if no robot is detected
         }
         return;  // Skip the rest of the loop to allow for calibration
     }
