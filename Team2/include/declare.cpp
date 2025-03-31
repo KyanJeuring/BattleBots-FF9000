@@ -61,8 +61,8 @@ int                         previousTime = 0;
 const int                   GRIPPER_INTERVAL = 20;
 
 //Rotation Sensors
-const int                   MOTOR_R1 = 2;
-const int                   MOTOR_R2 = 3;
+const int                   MOTOR_R1 = 2; // Left Encoder
+const int                   MOTOR_R2 = 3; // Right Encoder
 
 const int                   ISR_INTERVAL = 20;  // interval of 20 milli seconds to update counter by interupt
 
