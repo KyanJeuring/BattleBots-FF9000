@@ -38,7 +38,6 @@ void setup()
 
 void loop()
 {
-    // 
     int unsigned currentTime = millis();
     // Check if the game has ended
     if (gameEnded)
@@ -60,7 +59,7 @@ void loop()
         // If obstacle detected within 12cm, turn around
         if (distance < 12)
         {
-            turnAroundMillis();
+            turn180(200, 200);
             return;  // Skip the rest of the loop to start turning
         }
     }

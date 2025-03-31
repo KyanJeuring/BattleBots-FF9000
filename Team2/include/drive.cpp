@@ -26,21 +26,21 @@ void stopMotors()
     analogWrite(MOTOR_A_BACKWARD, 0);
 }
 
-void moveForward(int _leftSpeed, int _rightSpeed)
+void moveForward(int _rightSpeed, int _leftSpeed)
 {
     if (!gameEnded)
     {
-        analogWrite(MOTOR_B_FORWARD, _leftSpeed);
-        analogWrite(MOTOR_A_FORWARD, _rightSpeed);
+        analogWrite(MOTOR_B_FORWARD, _rightSpeed);
+        analogWrite(MOTOR_A_FORWARD, _leftSpeed);
     }
 }
 
-void moveBackward(int _leftSpeed, int _rightSpeed)
+void moveBackward(int _rightSpeed, int _leftSpeed)
 {
     if (!gameEnded)
     {
-        analogWrite(MOTOR_B_BACKWARD, _leftSpeed);
-        analogWrite(MOTOR_A_BACKWARD, _rightSpeed);
+        analogWrite(MOTOR_B_BACKWARD, _rightSpeed);
+        analogWrite(MOTOR_A_BACKWARD, _leftSpeed);
     }
 }
 
@@ -48,8 +48,8 @@ void turn180(int _leftSpeed, int _rightSpeed)
 {
     analogWrite(MOTOR_B_BACKWARD, 0);
     analogWrite(MOTOR_A_FORWARD, 0);
-    analogWrite(MOTOR_B_FORWARD, _leftSpeed);
-    analogWrite(MOTOR_A_BACKWARD, _rightSpeed);
+    analogWrite(MOTOR_B_FORWARD, _rightSpeed);
+    analogWrite(MOTOR_A_BACKWARD, _leftSpeed);
 }
 
 void turnLeftMillis(int angle)

@@ -32,10 +32,10 @@ void endGame()
     {
         // Stop the robot
         stopMotors();
-        int startTime = millis();
+        long startTime = millis();
         while (millis() < startTime + 1000)
         {
-            conePickedUp = false; // Open gripper
+            openGripper(); // Open gripper
             setDriveBackwardColor();
             moveBackward(200, 200);  // Move backward while dropping the cone
         }

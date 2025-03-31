@@ -6,6 +6,7 @@ void readSensors()
     }
 }
 
+// Function to calculate the line position based on sensor values
 int calculateLinePosition()
 {
     long weightedSum = 0;
@@ -23,6 +24,7 @@ int calculateLinePosition()
     return weightedSum / sum;  // No line detected
 }
 
+// Initialize the endGame() function to get it in scope
 void endGame();
 
 void getLinePosition()
