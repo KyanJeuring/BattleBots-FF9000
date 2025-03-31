@@ -32,7 +32,7 @@ const int                   ECHO = 8;
 
 // Encoder Pulse Counters
 volatile signed int         _leftTicks = 0;
-volatile signed int         _rightTicks = 10;
+volatile signed int         _rightTicks = 8;
 
 // Define NeoPixel
 const int                   NEOPIXEL_PIN = 4;
