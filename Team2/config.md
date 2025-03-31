@@ -1,4 +1,4 @@
-
+Copyright © Kyan Jeuring & Miriam Cerulíková 2025
 
 ## Motors
 
