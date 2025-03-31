@@ -1,4 +1,6 @@
 /**
+ *  Copyright © Kyan Jeuring & Miriam Cerulíková 2025
+ * 
  *  Controls the gripper servo motor by generating a PWM signal.
  *
  *  This function generates a PWM signal to control a servo motor connected to the gripper.

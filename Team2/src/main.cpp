@@ -1,3 +1,5 @@
+// Copyright © Kyan Jeuring & Miriam Cerulíková 2025
+
 #include <Arduino.h>
 #include <declare.cpp>
 #include <debugLight.cpp>

@@ -1,4 +1,6 @@
+// Copyright © Kyan Jeuring & Miriam Cerulíková 2025
 // Function to measure distance using ultrasonic sensor
+
 float measureDistance()
 {
     // Clear the TRIG pin

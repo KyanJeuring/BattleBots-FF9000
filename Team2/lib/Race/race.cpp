@@ -1,3 +1,5 @@
+// Copyright © Kyan Jeuring & Miriam Cerulíková 2025
+
 #include <Arduino.h>
 #include <declare.cpp>
 #include <debugLight.cpp>
@@ -11,8 +13,6 @@ void setup()
 {
     Serial.begin(9600);
     NeoPixel.begin();
-    NeoPixel.clear();
-    NeoPixel.show();
     NeoPixel.setBrightness(40);
 
     // Set Motor Pins
@@ -38,8 +38,13 @@ void setup()
 
 void loop()
 {
-    // put your main code here, to run repeatedly:
+    if(!robotCalibrated)
+    {
+        setStandByColor();
+    }
+
     int unsigned currentTime = millis();
+    // Check if the game has ended
     if (gameEnded)
     {
 
@@ -57,13 +62,14 @@ void loop()
         float distance = measureDistance();
 
         // If obstacle detected within 12cm, turn around
-        if (distance < 12)
+        if (distance < 15)
         {
-            turnAroundMillis();
+            turn180(200, 200);
             return;  // Skip the rest of the loop to start turning
         }
     }
 
+    // Check if the gripper should be opened or closed based on the conePickUp state
     if (conePickedUp)
     {
         if (currentTime - previousTime >= GRIPPER_INTERVAL)
@@ -81,20 +87,37 @@ void loop()
         }
     }
 
+    // Check if the cone is in the square and if the robot is not calibrated
     if (coneInSquare && !sensorsCalibrated)
     {
-        //calibrateSensors
+        // Start calibrating the line sensors when a robot is detected for 200ms
+        static unsigned long detectionStartTime = 0;
+
         if (measureDistance() < 30)
         {
-            robotDetected = true;
-            if(robotDetected)
+            if (detectionStartTime == 0)
             {
-                calibrateSensors();
+                detectionStartTime = millis();  // Start timing
             }
+            else if (millis() - detectionStartTime >= 350)
+            {
+                robotDetected = true;
+                if (robotDetected)
+                {
+                    calibrateSensors();
+                    robotCalibrated = true;  // Set the robot as calibrated
+                }
+                detectionStartTime = 0;  // Reset the timer after calibration
+            }
+        }
+        else
+        {
+            detectionStartTime = 0;  // Reset the timer if no robot is detected
         }
         return;  // Skip the rest of the loop to allow for calibration
     }
 
+    // Check if the sensors are calibrated and if the cone is not picked up
     if (sensorsCalibrated && !conePickedUp)
     {
         //pickUpCone
@@ -102,15 +125,19 @@ void loop()
         return;
     }
 
+    // Check if the sensors are calibrated and if the game has not started yet
     if (sensorsCalibrated && !gameStarted && conePickedUp)
     {
+        // Start the game by turning left for 90 milliseconds
         turnLeftMillis(90);
-        if (robotState != FOLLOW_LINE) return;
+        if (robotState != FOLLOW_LINE) return; // Ensure the robot is in the FOLLOW_LINE state before proceeding
         gameStarted = true;
     }
 
+    // Check if the game has started and if the game has not ended yet
     if (gameStarted && !gameEnded)
     {
+        // Get the line position and take action based on it
         getLinePosition();
 
         switch (linePosition)

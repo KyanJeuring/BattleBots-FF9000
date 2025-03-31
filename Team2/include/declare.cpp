@@ -1,3 +1,5 @@
+// Copyright © Kyan Jeuring & Miriam Cerulíková 2025
+
 #include <Adafruit_NeoPixel.h>
 
 enum RobotState             {FOLLOW_LINE, TURNING, TURNING_LEFT, TURNING_RIGHT, TURNING_AROUND, CHECKING_FOR_PATH_AHEAD};

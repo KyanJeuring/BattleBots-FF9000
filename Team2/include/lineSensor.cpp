@@ -1,3 +1,5 @@
+// Copyright © Kyan Jeuring & Miriam Cerulíková 2025
+
 void readSensors()
 {
     for (int i = 0; i < NUM_SENSORS; i++)

@@ -1,3 +1,5 @@
+// Copyright © Kyan Jeuring & Miriam Cerulíková 2025
+
 void leftEncoderISR()
 {
     static unsigned long timer;

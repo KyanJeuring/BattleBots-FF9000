@@ -1,3 +1,5 @@
+// Copyright © Kyan Jeuring & Miriam Cerulíková 2025
+
 void calibrateSensors()
 {
     static bool firstRun = true;
