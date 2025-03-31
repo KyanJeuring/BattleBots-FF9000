@@ -47,7 +47,6 @@ void loop()
     // Check if the game has ended
     if (gameEnded)
     {
-
         if (currentTime - previousTime >= GRIPPER_INTERVAL)
         {
             previousTime = currentTime;
