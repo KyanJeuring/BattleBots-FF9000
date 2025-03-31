@@ -42,6 +42,7 @@ const int                   PIXEL_BOTTOM_RIGHT = 1;
 const int                   PIXEL_TOP_RIGHT = 2;
 const int                   PIXEL_TOP_LEFT = 3;
 Adafruit_NeoPixel           NeoPixel = Adafruit_NeoPixel(NUM_PIXELS, NEOPIXEL_PIN, NEO_RGB + NEO_KHZ800);
+
 // Motor Pins
 const int                   MOTOR_B_FORWARD = 6;   // Left Forward
 const int                   MOTOR_B_BACKWARD = 5;   // Left Reverse
@@ -73,6 +74,7 @@ bool                        gameEnded = false;
 bool                        motionComplete = true;
 bool                        robotDetected = false;
 bool                        blackSquareDetected = false;
+bool                        robotCalibrated = false;
 
 // Setup the minimum time to confirm a black square
 const int                   MIN_SQUARE_TIME = 2000;  // Minimum time in ms to confirm we're on a black square

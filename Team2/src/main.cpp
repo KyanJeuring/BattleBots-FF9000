@@ -11,8 +11,6 @@ void setup()
 {
     Serial.begin(9600);
     NeoPixel.begin();
-    NeoPixel.clear();
-    NeoPixel.show();
     NeoPixel.setBrightness(40);
 
     // Set Motor Pins
@@ -38,6 +36,11 @@ void setup()
 
 void loop()
 {
+    if(!robotCalibrated)
+    {
+        setStandByColor();
+    }
+
     int unsigned currentTime = millis();
     // Check if the game has ended
     if (gameEnded)
@@ -100,6 +103,7 @@ void loop()
                 if (robotDetected)
                 {
                     calibrateSensors();
+                    robotCalibrated = true;  // Set the robot as calibrated
                 }
                 detectionStartTime = 0;  // Reset the timer after calibration
             }
