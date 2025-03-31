@@ -34,7 +34,7 @@ void endGame()
     {
         // Stop the robot
         stopMotors();
-        long startTime = millis();
+        unsigned long startTime = millis();
         while (millis() < startTime + 1000)
         {
             openGripper(); // Open gripper
