@@ -27,12 +27,6 @@ void calibrateSensors()
         for (int i = 0; i < NUM_SENSORS; i++)
         {
             sensorThreshold[i] = (sensorMin[i] + sensorMax[i]) / 2;
-            Serial.print("Threshold [");
-            Serial.print(i);
-            Serial.print("]: ");
-            Serial.println(sensorThreshold[i]);
-            Serial.println(sensorMin[i]);
-            Serial.println(sensorMax[i]);
         }
         return;
     }

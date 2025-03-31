@@ -1,10 +1,10 @@
 // Copyright © Kyan Jeuring & Miriam Cerulíková 2025
 
-void setStandByColor()
+void blinkLEDs(int frequency, int r, int g, int b)
 {
     static unsigned long previousMillis = 0;
     static bool isOn = false;
-    const unsigned long interval = 500; // 500ms interval
+    const unsigned long interval = frequency; // Interval in milliseconds
 
     unsigned long currentMillis = millis();
 
@@ -15,21 +15,16 @@ void setStandByColor()
 
         if (isOn)
         {
-            NeoPixel.setPixelColor(PIXEL_TOP_LEFT, 255, 0, 0);
-            NeoPixel.setPixelColor(PIXEL_TOP_RIGHT, 255, 0, 0);
-            NeoPixel.setPixelColor(PIXEL_BOTTOM_LEFT, 255, 0, 0);
-            NeoPixel.setPixelColor(PIXEL_BOTTOM_RIGHT, 255, 0, 0);
+            NeoPixel.setPixelColor(PIXEL_TOP_LEFT, r, g, b);
+            NeoPixel.setPixelColor(PIXEL_TOP_RIGHT, r, g, g);
+            NeoPixel.setPixelColor(PIXEL_BOTTOM_LEFT, r, g, g);
+            NeoPixel.setPixelColor(PIXEL_BOTTOM_RIGHT, r, g, g);
             NeoPixel.show();
         }
         else
         {
-            NeoPixel.setPixelColor(PIXEL_TOP_LEFT, 0, 0, 0);
-            NeoPixel.setPixelColor(PIXEL_TOP_RIGHT, 0, 0, 0);
-            NeoPixel.setPixelColor(PIXEL_BOTTOM_LEFT, 0, 0, 0);
-            NeoPixel.setPixelColor(PIXEL_BOTTOM_RIGHT, 0, 0, 0);
-            NeoPixel.show();
+            NeoPixel.clear();
         }
-        NeoPixel.show();
     }
 }
 
@@ -87,11 +82,12 @@ void setDriveStopColor()
     NeoPixel.show();
 }
 
+void setStandByColor()
+{
+    blinkLEDs(500, 255, 0, 0);
+}
+
 void setCalibrateColor()
 {
-    NeoPixel.setPixelColor(PIXEL_TOP_LEFT, 0, 85, 255);
-    NeoPixel.setPixelColor(PIXEL_TOP_RIGHT, 0, 85, 255);
-    NeoPixel.setPixelColor(PIXEL_BOTTOM_LEFT, 0, 85, 255);
-    NeoPixel.setPixelColor(PIXEL_BOTTOM_RIGHT, 0, 85, 255);
-    NeoPixel.show();
+    blinkLEDs(350, 0, 60, 255);
 }

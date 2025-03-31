@@ -46,7 +46,7 @@ void moveBackward(int _rightSpeed, int _leftSpeed)
     }
 }
 
-void turn180(int _leftSpeed, int _rightSpeed)
+void turn180(int _rightSpeed, int _leftSpeed)
 {
     analogWrite(MOTOR_B_BACKWARD, 0);
     analogWrite(MOTOR_A_FORWARD, 0);
@@ -98,8 +98,8 @@ void turnRightMillis(int angle)
     {
         resetTicks();  // Reset left encoder ticks
         targetPulses = 0;
-        float turnDistance = (angle / 360.0) * turn_Circumference;
-        targetPulses = (turnDistance / WHEEL_CIRCUMFERENCE) * PULSE_PER_REVOLUTION;
+        float turnDistance = (angle / 360.0) * turn_Circumference; // Half the turning circumference
+        targetPulses = (turnDistance / WHEEL_CIRCUMFERENCE) * PULSE_PER_REVOLUTION; // Calculate target pulses for right turn
         stopMotors();
 
         moveForward(200, 0);         // Right turn: left motor moves forward, right motor stops
@@ -133,7 +133,7 @@ void turnAroundMillis()
         targetPulses = 0;
 
         float turnDistance = (3.14 * (DISTANCE_BETWEEN_WHEELS / 2));  // Half the turning circumference
-        targetPulses = (turnDistance / WHEEL_CIRCUMFERENCE) * PULSE_PER_REVOLUTION;
+        targetPulses = (turnDistance / WHEEL_CIRCUMFERENCE) * PULSE_PER_REVOLUTION; // Calculate target pulses for right turn
 
         turn180(200, 200);  // Left wheel moves backward, right moves forward
         setTurnAroundColor();
