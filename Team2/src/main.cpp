@@ -56,7 +56,7 @@ void loop()
     }
 
     // Check for obstacles (only when following line, not during turns)
-    if (robotState == FOLLOW_LINE && gameStarted && !gameEnded)
+    if (gameStarted && !gameEnded)
     {
         float distance = measureDistance();
 
