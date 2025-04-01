@@ -1,5 +1,14 @@
 // Copyright © Kyan Jeuring & Miriam Cerulíková 2025
 
+void resetLights()
+{
+    NeoPixel.setPixelColor(PIXEL_TOP_LEFT, 0, 0, 0);
+    NeoPixel.setPixelColor(PIXEL_TOP_RIGHT, 0, 0, 0);
+    NeoPixel.setPixelColor(PIXEL_BOTTOM_LEFT, 0, 0, 0);
+    NeoPixel.setPixelColor(PIXEL_BOTTOM_RIGHT, 0, 0, 0);
+    NeoPixel.show();
+}
+
 void blinkLEDs(int frequency, int r, int g, int b)
 {
     static unsigned long previousMillis = 0;
@@ -23,7 +32,7 @@ void blinkLEDs(int frequency, int r, int g, int b)
         }
         else
         {
-            NeoPixel.clear();
+            resetLights();
         }
     }
 }
@@ -84,10 +93,14 @@ void setDriveStopColor()
 
 void setStandByColor()
 {
-    blinkLEDs(500, 255, 0, 0);
+    blinkLEDs(350, 255, 0, 0);
 }
 
 void setCalibrateColor()
 {
-    blinkLEDs(350, 0, 60, 255);
+    NeoPixel.setPixelColor(PIXEL_TOP_LEFT, 0, 60, 255);
+    NeoPixel.setPixelColor(PIXEL_TOP_RIGHT, 0, 60, 255);
+    NeoPixel.setPixelColor(PIXEL_BOTTOM_LEFT, 0, 60, 255);
+    NeoPixel.setPixelColor(PIXEL_BOTTOM_RIGHT, 0, 60, 255);
+    NeoPixel.show();
 }
