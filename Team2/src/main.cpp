@@ -61,9 +61,14 @@ void loop()
         float distance = measureDistance();
 
         // If obstacle detected within 12cm, turn around
-        if (distance < 15)
+        if (distance < 12)
         {
-            turn180(200, 200);
+            if (robotState == TURNING_LEFT || robotState == TURNING_RIGHT)
+            {
+                robotState = TURNING_AROUND;
+            }
+            
+            turn180(220, 220);  // Turn around
             return;  // Skip the rest of the loop to start turning
         }
     }
@@ -89,7 +94,7 @@ void loop()
     // Check if the cone is in the square and if the robot is not calibrated
     if (coneInSquare && !sensorsCalibrated)
     {
-        // Start calibrating the line sensors when a robot is detected for 200ms
+        // Start calibrating the line sensors when a robot is detected for 350ms
         static unsigned long detectionStartTime = 0;
 
         if (measureDistance() < 30)
@@ -127,7 +132,7 @@ void loop()
     // Check if the sensors are calibrated and if the game has not started yet
     if (sensorsCalibrated && !gameStarted && conePickedUp)
     {
-        // Start the game by turning left for 90 milliseconds
+        // Start the game by turning left by 90 degrees
         turnLeftMillis(90);
         if (robotState != FOLLOW_LINE) return; // Ensure the robot is in the FOLLOW_LINE state before proceeding
         gameStarted = true;
