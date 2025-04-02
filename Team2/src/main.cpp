@@ -63,6 +63,7 @@ void loop()
         // If obstacle detected within 12cm, turn around
         if (distance < 12)
         {
+            // If the robot is in any turning state, set the state to TURNING_AROUND to prevent conflicts
             if (robotState == TURNING_LEFT || robotState == TURNING_RIGHT)
             {
                 robotState = TURNING_AROUND;
