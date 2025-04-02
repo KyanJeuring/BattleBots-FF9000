@@ -17,10 +17,7 @@ int                         sensorMax[NUM_SENSORS];
 int                         sensorThreshold[NUM_SENSORS];                                  // Array to store thresholds for each sensor
 
 //Line Positions
-bool                        leftTurn;
-bool                        rightTurn;
-bool                        tJunctionOrBase;
-bool                        deadEnd;
+bool                        leftTurn, rightTurn, tJunctionOrBase, deadEnd;
 
 //Measurements
 const float                 WHEEL_CIRCUMFERENCE = 20.4;
@@ -91,8 +88,7 @@ float                       Kd;  // Derivative Gain
 int                         correction;
 
 // Robot variables
-int                         pulses;
-int                         angle;
+int                         pulses, angle;
 int                         radius = DISTANCE_BETWEEN_WHEELS;
 int                         turn_Circumference = 2 * 3.14 * radius;
 float                       turnDistances = 0;  // ARC of a circle

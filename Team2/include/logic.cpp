@@ -32,7 +32,6 @@ void endGame()
     // Only end game if we're not already ending it
     if (!gameEnded)
     {
-        // Stop the robot
         stopMotors();
         unsigned long startTime = millis();
         while (millis() < startTime + 1000)

@@ -31,7 +31,7 @@ void setup()
     attachInterrupt(digitalPinToInterrupt(MOTOR_R1), leftEncoderISR, CHANGE);
     attachInterrupt(digitalPinToInterrupt(MOTOR_R2), rightEncoderISR, CHANGE);
 
-    //SERVO
+    //Servo
     pinMode(SERVO, OUTPUT);
     digitalWrite(SERVO, LOW);
 }
@@ -43,14 +43,15 @@ void loop()
         setStandByColor();
     }
 
-    int unsigned currentTime = millis();
+    unsigned long currentTime = millis();
+    
     // Check if the game has ended
     if (gameEnded)
     {
         if (currentTime - previousTime >= GRIPPER_INTERVAL)
         {
             previousTime = currentTime;
-            openGripper();  // Keep the gripper open to drop the cone
+            openGripper();  // Keep the gripper open after the cone drop
         }
         return;  // Skip the rest of the loop
     }
