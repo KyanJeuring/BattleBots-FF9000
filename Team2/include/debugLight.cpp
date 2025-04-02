@@ -58,27 +58,27 @@ void setDriveBackwardColor()
 void setTurnRightColor()
 {
     NeoPixel.setPixelColor(PIXEL_TOP_LEFT, 0, 0, 0);
-    NeoPixel.setPixelColor(PIXEL_TOP_RIGHT, 255, 100, 0);
+    NeoPixel.setPixelColor(PIXEL_TOP_RIGHT, 255, 144, 0);
     NeoPixel.setPixelColor(PIXEL_BOTTOM_LEFT, 0, 0, 0);
-    NeoPixel.setPixelColor(PIXEL_BOTTOM_RIGHT, 255, 100, 0);
+    NeoPixel.setPixelColor(PIXEL_BOTTOM_RIGHT, 255, 144, 0);
     NeoPixel.show();
 }
 
 void setTurnLeftColor()
 {
-    NeoPixel.setPixelColor(PIXEL_TOP_LEFT, 255, 100, 0);
+    NeoPixel.setPixelColor(PIXEL_TOP_LEFT, 255, 144, 0);
     NeoPixel.setPixelColor(PIXEL_TOP_RIGHT, 0, 0, 0);
-    NeoPixel.setPixelColor(PIXEL_BOTTOM_LEFT, 255, 100, 0);
+    NeoPixel.setPixelColor(PIXEL_BOTTOM_LEFT, 255, 144, 0);
     NeoPixel.setPixelColor(PIXEL_BOTTOM_RIGHT, 0, 0, 0);
     NeoPixel.show();
 }
 
 void setTurnAroundColor()
 {
-    NeoPixel.setPixelColor(PIXEL_TOP_LEFT, 255, 100, 0);
-    NeoPixel.setPixelColor(PIXEL_TOP_RIGHT, 255, 100, 0);
-    NeoPixel.setPixelColor(PIXEL_BOTTOM_LEFT, 255, 100, 0);
-    NeoPixel.setPixelColor(PIXEL_BOTTOM_RIGHT, 255, 100, 0);
+    NeoPixel.setPixelColor(PIXEL_TOP_LEFT, 255, 144, 0);
+    NeoPixel.setPixelColor(PIXEL_TOP_RIGHT, 255, 144, 0);
+    NeoPixel.setPixelColor(PIXEL_BOTTOM_LEFT, 255, 144, 0);
+    NeoPixel.setPixelColor(PIXEL_BOTTOM_RIGHT, 255, 144, 0);
     NeoPixel.show();
 }
 
