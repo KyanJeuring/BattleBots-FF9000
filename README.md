@@ -16,5 +16,5 @@ Each team has 3 sub-teams consisting of 2 people. Each sub-team works on a robot
 
 ### Team 3:
 
-- [Miguel Petisca Brandão Cavaleiro](https://github.com/Miguel-Cavaleiro-IT)
+- [Miguel Cavaleiro](https://github.com/Miguel-Cavaleiro-IT)
 - [Volkan Yildirim](https://github.com/volkanyildirim33)
