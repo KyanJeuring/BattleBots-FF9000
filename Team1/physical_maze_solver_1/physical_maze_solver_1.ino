@@ -1,30 +1,29 @@
 //distance between walls is 30cm
 //robot is about 15cm wide
 
+#include <Adafruit_NeoPixel.h>
 
+//---------------------------------------------------------------STATE VARIABLES
+boolean isStartSequenceActive = false;
+boolean isMazeNavigationActive = false;
 
+//---------------------------------------------------------------LINE SENSORS
+const int lineSensorPins[] = {A0, A1, A2, A3, A4, A5, A6, A7};
+int blackLineThreshold = 800;
 
+//---------------------------------------------------------------GRIPPER
+#define GRIPPER_SERVO_PIN 11
+#define SERVO_OPEN_POSITION 1600
+#define SERVO_CLOSE_POSITION  970
+#define SERVO_CYCLE_REPEAT 10
 
-
-//Bluetooth pin
-#define BTPIN 1
-
-// Left motor
-//IN1 is for turning the left wheel forward
-#define IN1 6
-//IN2 is for turning the left wheel backwards
-#define IN2 10
-// Right motor
-//IN3 is for turning the left wheel forward
-#define IN3 5
-//IN4 is for turning the left wheel backwards
-#define IN4 9
-
+//---------------------------------------------------------------DistanceSensor class
 class DistanceSensor
 {
   private:
     int trigPin;
     int echoPin;
+    const int maxDistance = 100; //set to -1 if you want no max Distance
 
     // gets raw data from the sensor
     float getPulseDuration()
@@ -35,15 +34,24 @@ class DistanceSensor
       digitalWrite(trigPin, HIGH);
       delayMicroseconds(10);
       digitalWrite(trigPin, LOW);
-
-      return pulseIn(echoPin, HIGH);
+      if (maxDistance == -1)
+      {
+        return pulseIn(echoPin, HIGH);
+      } else {
+        return pulseIn(echoPin, HIGH, 60 * maxDistance); //24000 is for about 400cm, so if you want a limit of one meter just set it to 6000
+      }
     }
 
-    // gets the distance measured by the sensor
+    // gets the distance measuLED_COLOR_RED by the sensor
     float getProcessedDistance()
     {
       float pulseDuration = getPulseDuration();
-      float distance = (pulseDuration * .0343) / 2;
+      float distance;
+      if (pulseDuration > 100) {
+        distance = (pulseDuration * .0343) / 2;
+      } else {
+        distance = maxDistance;
+      }
       return distance;
     }
 
@@ -58,7 +66,7 @@ class DistanceSensor
       pinMode(echoPin, INPUT);
     }
 
-    double getCuredDistance(int sampleNum = 7, int removedSamplesMarginWidth = 1)
+    double getCuLED_COLOR_REDDistance(int sampleNum = 7, int removedSamplesMarginWidth = 1)
     {
       int samples[sampleNum];
 
@@ -88,7 +96,7 @@ class DistanceSensor
       {
         samples[index] = samples[index + removedSamplesMarginWidth];
       }
-      // to remove the largest measurements taken, sampleNum will be decreased, so the last elements will just be ignored
+      // to remove the largest measurements taken, sampleNum will be decreased, so the last elements will just be ignoLED_COLOR_RED
       sampleNum = sampleNum - removedSamplesMarginWidth * 2;
 
       // calculate average of remaining samples
@@ -103,140 +111,379 @@ class DistanceSensor
     }
 };
 
-//Distance sensors
-DistanceSensor sensorForward(2, 4);
-DistanceSensor sensorLeft(7, 8);
-DistanceSensor sensorRight(11, 12);
+DistanceSensor distanceSensorFront = DistanceSensor(4, 7);
+int distanceFront;
+
+DistanceSensor distanceSensorLeft = DistanceSensor(8, 13);
+int distanceLeft;
+
+//---------------------------------------------------------------MOTOR DISTANCES
+#define IN1 6     //Left motor forward
+#define IN2 10    //Left motor backwards
+#define IN3 5     //Right motor forward
+#define IN4 9     //Right motor backwards
+#define MOTOR_STALL_TIMEOUT 1700
+#define MAX_MOTOR_SPEED 255
+
+//---------------------------------------------------------------MOTOR ENCODERS
+#define LEFT_ENCODER_PIN  2
+#define RIGHT_ENCODER_PIN 3
+int leftEncoderCount;
+int rightEncoderCount;
+int totalLeftEncoderCount = 0, previousleftEncoderCount;
+int totalRightEncoderCount  = 0, previousrightEncoderCount;
+
+//---------------------------------------------------------------statusLEDs
+#define NEOPIXEL_PIN 12
+Adafruit_NeoPixel statusLEDs(4, NEOPIXEL_PIN, NEO_RGB + NEO_KHZ800);
+const uint32_t LED_COLOR_RED = statusLEDs.Color(255, 0, 0);
+const uint32_t LED_COLOR_YELLOW = statusLEDs.Color(255, 150, 0);
+const uint32_t LED_COLOR_BLUE = statusLEDs.Color(0, 0, 255);
+const uint32_t LED_COLOR_WHITE = statusLEDs.Color(255, 255, 255);
+const uint32_t LED_COLOR_OFF = statusLEDs.Color(0, 0, 0);
+
+//---------------------------------------------------------------FUNCTIONS
+void updateFrontDistance() {
+  distanceFront = distanceSensorFront.getCuLED_COLOR_REDDistance();
+}
+
+void updateLeftDistance() {
+  distanceLeft = distanceSensorLeft.getCuLED_COLOR_REDDistance();
+}
+
+void lineSensorPinsInit()
+{
+  pinMode(A0, INPUT);
+  pinMode(A1, INPUT);
+  pinMode(A2, INPUT);
+  pinMode(A3, INPUT);
+  pinMode(A4, INPUT);
+  pinMode(A6, INPUT);
+  pinMode(A7, INPUT);
+}
+
+void pauseExecutionForMillis(int duration)
+{
+  unsigned long startTime = millis();
+  while (millis() < startTime + duration)
+  {
+    //do nothing
+  }
+}
+
+boolean reachedBlackZone()
+{
+  int count = 0;
+  for (int i = 0; i < 8; i++)
+  {
+    if (analogRead(lineSensorPins[i]) > blackLineThreshold)
+    {
+      count++;
+    }
+  }
+  if (count < 6)
+  {
+    return false;
+  }
+  return true;
+}
 
 
-// PID constants
-float _Kp = 0.12; // Increased Proportional Gain slightly   /Proportional gain     corrects error
-float _Ki = 0.001; // Small Integral Gain to fix slow drifting  /Integral gain         corrects small errors, that are long term (slightly being off the line)
-float _Kd = 0.02; // Reduced Derivative Gain  /Derivate gain         dampens the corrections
+void setServo(int pulse)
+{
+  for (int i = 0; i < SERVO_CYCLE_REPEAT; i++)
+  {
+    digitalWrite(GRIPPER_SERVO_PIN, HIGH);
+    delayMicroseconds(pulse);
+    digitalWrite(GRIPPER_SERVO_PIN, LOW);
+    delay(20);
+  }
+}
 
-int _previousError = 0;
-int _integral = 0;
-int _baseSpeed = 220; // Adjust based on motor power
+void openGripper()
+{
+  setServo(SERVO_OPEN_POSITION);
+}
 
-int triggerTime = 0;
-int interval = 400;
+void closeGripper()
+{
+  setServo(SERVO_CLOSE_POSITION );
+}
 
-void setup() {
-  Serial.begin(9600);
+void setupMotorPins()
+{
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
   pinMode(IN3, OUTPUT);
   pinMode(IN4, OUTPUT);
-  pinMode(BTPIN, OUTPUT);
 }
 
-void loop() {
-  if (millis() > triggerTime) {
-    triggerTime = millis() + interval;
-
-    int position = readSensors();
-    int error = position;
-
-    PID_Linefollow(error);
-
-    int distanceLeft = sensorLeft.getCuredDistance();
-
-    int distanceForward = sensorForward.getCuredDistance();
-
-    Serial.println("Left= " + String(distanceLeft) + " Forward= " + String(distanceForward));
-
-  }
+void driveForward()
+{
+  statusLEDs.fill(LED_COLOR_WHITE, 0, 4);
+  statusLEDs.show();
+  analogWrite(IN1, MAX_MOTOR_SPEED * 0.9);
+  analogWrite(IN2, 0);
+  analogWrite(IN3, MAX_MOTOR_SPEED);
+  analogWrite(IN4, 0);
 }
 
-int readSensors() {
-  int weightedSum = 0;
-  int sum = 0;
-
-  //  for (int i = 0; i < 8; i++) {
-  //    _sensorValues[i] = analogRead(_sensorPins[i]);
-  //    // Serial.print(_sensorValues[i]);
-  //    // Serial.print(" ");
-  //    if (_sensorValues[i] > _sensorThreshold) {
-  //      weightedSum += _sensorWeights[i];
-  //      sum++;
-  //    }
-  //  }
-
-
-
-  int distanceLeft = sensorLeft.getCuredDistance();
-  //should have a distance of 7.5cm ideally
-
-  weightedSum = (7.5 - distanceLeft) * 100;
-
-  sum = 1;
-
-  if (sum == 0)
-  {
-    return _previousError > 0 ? 1000 : -1000;; // If line is lost, continue turning
-  }
-  return weightedSum / sum; // Calculate position
+void driveForwardSlow()
+{
+  statusLEDs.fill(LED_COLOR_WHITE, 0, 4);
+  statusLEDs.show();
+  analogWrite(IN1, MAX_MOTOR_SPEED * 0.6);
+  analogWrite(IN2, 0);
+  analogWrite(IN3, MAX_MOTOR_SPEED * 0.6);
+  analogWrite(IN4, 0);
 }
 
-void PID_Linefollow(int error) {
-  int P = error;
-  _integral += error;
-
-  // Prevent integral too big or small
-  //constraing here will make integral limit the integral from being smaller than -1000 or larger than 1000. So even if the integral is -6000, it will become -1000
-  _integral = constrain(_integral, -1000, 1000);
-
-  //Substract the past error from the new error
-  int D = error - _previousError;
-
-  //here is our main formula, we adjust Kp, Ki, Kd to see what works
-  int PIDvalue = (_Kp * P) + (_Ki * _integral) + (_Kd * D);
-  _previousError = error;
-
-  int leftSpeed = _baseSpeed - PIDvalue;
-  int rightSpeed = _baseSpeed + PIDvalue;
-
-  //limit the speeds to not be too big
-  leftSpeed = constrain(leftSpeed, -255, 255);
-  rightSpeed = constrain(rightSpeed, -255, 255);
-
-  motor_drive(leftSpeed, rightSpeed);
+void driveBackwardsRotate()
+{
+  analogWrite(IN1, 0);
+  analogWrite(IN2, MAX_MOTOR_SPEED * 0.4);
+  analogWrite(IN3, 0);
+  analogWrite(IN4, MAX_MOTOR_SPEED);
 }
 
-void motor_drive(int left, int right) {
-  // Apply a minimum speed limit to prevent motor jitter
-  if (abs(left) < 50)
-  {
-    left = 0;
-  }
-  if (abs(right) < 50)
-  {
-    right = 0;
-  }
-  // Left motor control
-  if (left >= 0)
-  {
-    analogWrite(IN1, left);
-    analogWrite(IN2, 0);
-  } else
-  {
-    analogWrite(IN1, 0);
-    analogWrite(IN2, -left);
-  }
+void driveBackwards()
+{
+  analogWrite(IN1, 0);
+  analogWrite(IN2, MAX_MOTOR_SPEED);
+  analogWrite(IN3, 0);
+  analogWrite(IN4, MAX_MOTOR_SPEED);
+}
 
-  // Right motor control
-  if (right >= 0)
+void stopMotors()
+{
+  analogWrite(IN1, 0);
+  analogWrite(IN2, 0);
+  analogWrite(IN3, 0);
+  analogWrite(IN4, 0);
+}
+
+void turnLeft()
+{
+  statusLEDs.fill(LED_COLOR_RED, 0, 4);
+  statusLEDs.show();
+  analogWrite(IN1, 0);
+  analogWrite(IN2, 0);
+  analogWrite(IN3, MAX_MOTOR_SPEED * 0.8);
+  analogWrite(IN4, 0);
+}
+
+void shiftLeft()
+{
+  analogWrite(IN1, MAX_MOTOR_SPEED);
+  analogWrite(IN2, 0);
+  analogWrite(IN3, MAX_MOTOR_SPEED * 0.7);
+  analogWrite(IN4, 0);
+}
+
+void shiftRight()
+{
+  analogWrite(IN1, MAX_MOTOR_SPEED * 0.6);
+  analogWrite(IN2, 0);
+  analogWrite(IN3, MAX_MOTOR_SPEED);
+  analogWrite(IN4, 0);
+}
+
+void rotate()
+{
+  analogWrite(IN1, MAX_MOTOR_SPEED * 0.8);
+  analogWrite(IN2, 0);
+  analogWrite(IN3, 0);
+  analogWrite(IN4, MAX_MOTOR_SPEED * 0.8);
+}
+
+void CountEncoder1()
+{
+  noInterrupts();
+  leftEncoderCount++;
+  interrupts();
+}
+
+void CountEncoder2()
+{
+  noInterrupts();
+  rightEncoderCount++;
+  interrupts();
+}
+
+void turnLeftOnPulses(int targetEncoderCount)
+{
+  stopMotors();
+  leftEncoderCount = 0;
+  rightEncoderCount = 0;
+  int lastrightEncoderCount = -1;
+  int lastleftEncoderCount = -1;
+  long stallRecoveryDeadline = millis() + MOTOR_STALL_TIMEOUT;
+  updateLeftDistance();
+  turnLeft();
+  while ((leftEncoderCount < targetEncoderCount && rightEncoderCount < targetEncoderCount) && distanceLeft >= 10)
   {
-    analogWrite(IN3, right);
-    analogWrite(IN4, 0);
+    if (leftEncoderCount == lastleftEncoderCount && rightEncoderCount == lastrightEncoderCount)
+    {
+      //wheels didn't spin
+      if (millis() > stallRecoveryDeadline && distanceLeft > 10)
+      {
+        //robot has been stuck for a while
+        stallRecoveryDeadline = millis() + MOTOR_STALL_TIMEOUT;
+        statusLEDs.fill(LED_COLOR_WHITE, 0, 4);
+        statusLEDs.show();
+        driveBackwardsRotate();
+        pauseExecutionForMillis(400);
+        stopMotors();
+      }
+    }
+    else
+    {
+      stallRecoveryDeadline = millis() + MOTOR_STALL_TIMEOUT;
+      lastleftEncoderCount = leftEncoderCount;
+      lastrightEncoderCount = rightEncoderCount;
+    }
+    updateFrontDistance();
+    updateLeftDistance();
+  }
+  stopMotors();
+}
+
+void driveForwardOnPulses(int targetEncoderCount)
+{
+  stopMotors();
+  leftEncoderCount = 0;
+  rightEncoderCount = 0;
+  int lastrightEncoderCount = -1;
+  int lastleftEncoderCount = -1;
+  long stallRecoveryDeadline = millis() + MOTOR_STALL_TIMEOUT;
+  if (distanceLeft <= 5)
+  {
+    shiftLeft();
+  }
+  else if (distanceLeft >= 13 && distanceLeft < 20)
+  {
+    shiftRight();
   }
   else
   {
-    analogWrite(IN3, 0);
-    analogWrite(IN4, -right);
+    driveForward();
   }
-  Serial.print(left);
-  Serial.print("   ");
-  Serial.print(right);
-  Serial.println("");
+  while ((leftEncoderCount < targetEncoderCount && rightEncoderCount < targetEncoderCount))
+  {
+    if (leftEncoderCount == lastleftEncoderCount && rightEncoderCount == lastrightEncoderCount)
+    { //wheel has not pulsed yet
+      if (millis() > stallRecoveryDeadline)
+      { //if the robot not moved for duration
+        stallRecoveryDeadline = millis() + MOTOR_STALL_TIMEOUT;
+        statusLEDs.fill(LED_COLOR_WHITE, 0, 4);
+        statusLEDs.show();
+        driveBackwards();
+        pauseExecutionForMillis(150);
+        driveBackwardsRotate();
+        pauseExecutionForMillis(250);
+      }
+    }
+    else
+    {
+      stallRecoveryDeadline = millis() + MOTOR_STALL_TIMEOUT;
+      lastleftEncoderCount = leftEncoderCount;
+      lastrightEncoderCount = rightEncoderCount;
+    }
+    distanceFront = distanceSensorFront.getCuLED_COLOR_REDDistance();
+    distanceLeft = distanceSensorLeft.getCuLED_COLOR_REDDistance();
+  }
+  //  stopMotors();
+  driveForwardSlow();
+}
+
+//---------------------------------------------------------------SETUP
+void setup()
+{
+  pinMode(LEFT_ENCODER_PIN , INPUT);
+  pinMode(RIGHT_ENCODER_PIN, INPUT);
+  attachInterrupt(digitalPinToInterrupt(LEFT_ENCODER_PIN ), CountEncoder1, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(RIGHT_ENCODER_PIN), CountEncoder2, CHANGE);
+  lineSensorPinsInit();
+  statusLEDs.begin();
+  statusLEDs.fill(LED_COLOR_BLUE, 0, 4);
+  statusLEDs.show();
+  leftEncoderCount = 0;
+  rightEncoderCount = 0;
+}
+
+//---------------------------------------------------------------MAIN LOOP
+void loop()
+{
+  if (isMazeNavigationActive)
+  {
+    closeGripper();
+    updateFrontDistance();
+    updateLeftDistance();
+    //    In case that there is a line, follow line
+    if (reachedBlackZone())
+    {
+      stopMotors();
+      openGripper();
+      pauseExecutionForMillis(300);
+      isMazeNavigationActive = false;
+      isStartSequenceActive = false;
+      driveBackwards();
+      pauseExecutionForMillis(1000);
+      stopMotors();
+      pauseExecutionForMillis(60000);
+    }
+    if (distanceLeft <= 17 && distanceFront >= 12)
+    {
+      //can't go left, can only go forward
+      driveForwardOnPulses(10);
+      //            pauseExecutionForMillis(100);
+    }
+    else if (distanceLeft > 17 && distanceFront > 12)
+    {
+      //can go left and forward, will choose left
+      turnLeftOnPulses(36);
+      pauseExecutionForMillis(200);
+      driveForwardOnPulses(20);
+      turnLeftOnPulses(36);
+    }
+    else
+    {
+      //can't go left, can't go forward, will rotate to the right
+      statusLEDs.fill(LED_COLOR_YELLOW, 0, 4);
+      statusLEDs.show();
+      driveBackwards();
+      pauseExecutionForMillis(100);
+      stopMotors();
+      while (distanceFront < 15)
+      {
+        rotate();
+        updateFrontDistance();
+      }
+    }
+  }
+  else
+  {
+    if (isStartSequenceActive == true)
+    {
+      driveForward();
+      pauseExecutionForMillis(800);
+      closeGripper();
+      leftEncoderCount = 0;
+      rightEncoderCount = 0;
+      turnLeftOnPulses(36);
+      driveForwardOnPulses(70);
+      isMazeNavigationActive = true;
+    }
+    else
+    {
+      pauseExecutionForMillis(1000);
+      updateFrontDistance();
+      if (distanceFront < 30)
+      {
+        openGripper();
+        pauseExecutionForMillis(1500);
+        isStartSequenceActive = true;
+      }
+    }
+  }
 }
