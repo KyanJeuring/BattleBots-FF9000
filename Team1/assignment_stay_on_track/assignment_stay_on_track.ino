@@ -13,10 +13,10 @@
 #define IN4 9
 
 // Sensor array
-int sensorPins[] = { A0, A1, A2, A3, A4, A5, A6, A7 };
-int sensorValues[8];
-int sensorThreshold = 500; // Hardcoded for now, will be automated in the future
-int sensorWeights[] = { -3500, -2500, -1500, -500, 500, 1500, 2500, 3500 }; // Position weights
+int _sensorPins[] = { A0, A1, A2, A3, A4, A5, A6, A7 };
+int _sensorValues[8];
+int _sensorThreshold = 500; // Hardcoded for now, will be automated in the future
+int _sensorWeights[] = { -3500, -2500, -1500, -500, 500, 1500, 2500, 3500 }; // Position weights
 
 // PID constants
 float _Kp = 0.12; // Increased Proportional Gain slightly   /Proportional gain     corrects error
