@@ -38,7 +38,9 @@ class DistanceSensor
       {
         return pulseIn(echoPin, HIGH);
       } else {
-        return pulseIn(echoPin, HIGH, 60 * MAX_DISTANCE); //24000 is for about 400cm, so if you want a limit of one meter just set it to 6000
+        return pulseIn(echoPin, HIGH, 60 * MAX_DISTANCE);
+        //for MAX_DISTANCE 24000 is for about 400cm,
+        // so if you want a limit of one meter just set it to 6000
       }
     }
 
@@ -91,12 +93,14 @@ class DistanceSensor
       }
 
       // remove margins; after this the length of the array will change
-      // to remove the smallest measurements taken, the entire array will be shifted to the front
+      // to remove the smallest measurements taken,
+      // the entire array will be shifted to the front
       for (int index = 0; index < sampleNum; index++)
       {
         samples[index] = samples[index + removedSamplesMarginWidth];
       }
-      // to remove the largest measurements taken, sampleNum will be decreased, so the last elements will just be ignoLED_COLOR_RED
+      // to remove the largest measurements taken, 
+      // sampleNum will be decreased, so the last elements will just be ignored
       sampleNum = sampleNum - removedSamplesMarginWidth * 2;
 
       // calculate average of remaining samples
@@ -326,9 +330,14 @@ void turnLeftOnPulses(int targetEncoderCount)
   updateLeftDistance();
   turnLeft();
 
-  while ((leftEncoderCount < targetEncoderCount && rightEncoderCount < targetEncoderCount) && distanceLeft >= 10)
+  while (
+    (leftEncoderCount < targetEncoderCount && rightEncoderCount < targetEncoderCount)
+    && distanceLeft >= 10)
   {
-    if (leftEncoderCount == lastleftEncoderCount && rightEncoderCount == lastrightEncoderCount)
+    if (
+      leftEncoderCount == lastleftEncoderCount
+      &&
+      rightEncoderCount == lastrightEncoderCount)
     {
       //wheels didn't spin
       if (millis() > stallRecoveryDeadline && distanceLeft > 10)
@@ -378,7 +387,11 @@ void driveForwardOnPulses(int targetEncoderCount)
   }
   while ((leftEncoderCount < targetEncoderCount && rightEncoderCount < targetEncoderCount))
   {
-    if (leftEncoderCount == lastleftEncoderCount && rightEncoderCount == lastrightEncoderCount)
+    if (
+      leftEncoderCount == lastleftEncoderCount
+      &&
+      rightEncoderCount == lastrightEncoderCount)
+      
     { //wheel has not pulsed yet
       if (millis() > stallRecoveryDeadline)
       { //if the robot not moved for duration
