@@ -1,136 +1,181 @@
+// Copyright © Kyan Jeuring & Miriam Cerulíková 2025
+
 #include <Arduino.h>
-
-// Define pins
-const int       BLUETOOTH_TRANSMIT= 1;
-const int       MOTOR_A_BACKWARD = 11;
-const int       MOTOR_A_FORWARD = 10;
-const int       MOTOR_B_FORWARD = 6;
-const int       MOTOR_B_BACKWARD = 5;
-const int       SONAR_SENSOR_ECHO = 8;
-const int       SONAR_SENSOR_TRIGGER = 7;
-
-// Define state variables for the millis
-unsigned long   _lastTime = 0;
-unsigned long   _startMillis = 0;
-bool            _avoidObject = false;
-bool            _emergencyStop = false;
-
-// Calibration offsets
-const int CALIBRATION_OFFSET_A = 10; // Adjust this value as needed
-const int CALIBRATION_OFFSET_B = 5;  // Adjust this value as needed
-
-// Define the function prototype
-void drive(int motorAForward, int motorABackward, int motorBForward, int motorBBackward);
-void buttonPress();
-int calibrate(int n, int offset);
-long readSonarSensor();
-void setNeoPixel(int index, uint32_t color);
+#include <declare.cpp>
+#include <debugLight.cpp>
+#include <gripper.cpp>
+#include <lineSensor.cpp>
+#include <drive.cpp>
+#include <logic.cpp>
+#include <lineSensorCalibration.cpp>
 
 void setup()
 {
-    // Initialize serial communication
     Serial.begin(9600);
+    NeoPixel.begin();
+    NeoPixel.setBrightness(40);
 
-    // Initialize the input and outputs
-    pinMode(BLUETOOTH_TRANSMIT, OUTPUT);
-    pinMode(MOTOR_A_BACKWARD, OUTPUT);
-    pinMode(MOTOR_A_FORWARD, OUTPUT);
+    // Set Motor Pins
     pinMode(MOTOR_B_FORWARD, OUTPUT);
     pinMode(MOTOR_B_BACKWARD, OUTPUT);
-    pinMode(SONAR_SENSOR_TRIGGER, OUTPUT);
-    pinMode(SONAR_SENSOR_ECHO, INPUT);
+    pinMode(MOTOR_A_FORWARD, OUTPUT);
+    pinMode(MOTOR_A_BACKWARD, OUTPUT);
+    digitalWrite(MOTOR_B_FORWARD, LOW);
+    digitalWrite(MOTOR_B_BACKWARD, LOW);
+    digitalWrite(MOTOR_A_FORWARD, LOW);
+    digitalWrite(MOTOR_A_BACKWARD, LOW);
+    pinMode(TRIG, OUTPUT);
+    pinMode(ECHO, INPUT);
 
-    // Initialize the outputs
-    digitalWrite(MOTOR_A_BACKWARD, HIGH);
-    digitalWrite(MOTOR_A_FORWARD, HIGH);
-    digitalWrite(MOTOR_B_FORWARD, HIGH);
-    digitalWrite(MOTOR_B_BACKWARD, HIGH);
+    // Attach Interrupts for Encoders
+    attachInterrupt(digitalPinToInterrupt(MOTOR_R1), leftEncoderISR, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(MOTOR_R2), rightEncoderISR, CHANGE);
+
+    //Servo
+    pinMode(SERVO, OUTPUT);
+    digitalWrite(SERVO, LOW);
 }
 
 void loop()
 {
-    unsigned long currentMillis = millis();
-
-    if (_avoidObject && currentMillis - _startMillis >= 1000)
+    if(!robotCalibrated)
     {
-        _avoidObject = false;
+        setStandByColor();
     }
-    else if (!_avoidObject)
+
+    unsigned long currentTime = millis();
+    
+    // Check if the game has ended
+    if (gameEnded)
     {
-        long distance = readSonarSensor();
-        if (distance < 15)
+        if (currentTime - previousTime >= GRIPPER_INTERVAL)
         {
-            Serial.print("Obstacle detected at distance: ");
-            Serial.print(distance);
-            Serial.println(". Avoiding object...");
-            Serial.println("Turn left");
-            drive(255, 0, 0, 255);
-            delay(500);
+            previousTime = currentTime;
+            openGripper();  // Keep the gripper open after the cone drop
+        }
+        return;  // Skip the rest of the loop
+    }
 
-            Serial.println("Go forward");
-            drive(255, 0, 255, 0);
-            delay(1000);
+    // Check for obstacles (only when following line, not during turns)
+    if (gameStarted && !gameEnded)
+    {
+        float distance = measureDistance();
 
-            Serial.println("Turn right");
-            drive(0, 255, 255, 0);
-            delay(500);
+        // If obstacle detected within 12cm, turn around
+        if (distance < 12)
+        {
+            // If the robot is in any turning state, set the state to TURNING_AROUND to prevent conflicts
+            if (robotState == TURNING_LEFT || robotState == TURNING_RIGHT)
+            {
+                robotState = TURNING_AROUND;
+            }
+            
+            turn180(220, 220);  // Turn around
+            return;  // Skip the rest of the loop to start turning
+        }
+    }
 
-            Serial.println("Go forward");
-            drive(255, 0, 255, 0);
-            delay(1000);
+    // Check if the gripper should be opened or closed based on the conePickUp state
+    if (conePickedUp)
+    {
+        if (currentTime - previousTime >= GRIPPER_INTERVAL)
+        {
+            previousTime = currentTime;
+            closeGripper();
+        }
+    }
+    else
+    {
+        if (currentTime - previousTime >= GRIPPER_INTERVAL)
+        {
+            previousTime = currentTime;
+            openGripper();
+        }
+    }
 
-            Serial.println("Turn right");
-            drive(0, 255, 255, 0);
-            delay(500);
+    // Check if the cone is in the square and if the robot is not calibrated
+    if (coneInSquare && !sensorsCalibrated)
+    {
+        // Start calibrating the line sensors when a robot is detected for 350ms
+        static unsigned long detectionStartTime = 0;
 
-            Serial.println("Go forward");
-            drive(255, 0, 255, 0);
-            delay(1000);
-
-            Serial.println("Turn left");
-            drive(255, 0, 0, 255);
-            delay(500);
-            _startMillis = currentMillis;
-            _avoidObject = true;
+        if (measureDistance() < 30)
+        {
+            if (detectionStartTime == 0)
+            {
+                detectionStartTime = millis();  // Start timing
+            }
+            else if (millis() - detectionStartTime >= 350)
+            {
+                robotDetected = true;
+                if (robotDetected)
+                {
+                    calibrateSensors();
+                    robotCalibrated = true;  // Set the robot as calibrated
+                }
+                detectionStartTime = 0;  // Reset the timer after calibration
+            }
         }
         else
         {
-            drive(255, 0, 255, 0); // Drive forward
+            detectionStartTime = 0;  // Reset the timer if no robot is detected
         }
+        return;  // Skip the rest of the loop to allow for calibration
     }
 
-}
+    // Check if the sensors are calibrated and if the cone is not picked up
+    if (sensorsCalibrated && !conePickedUp)
+    {
+        //pickUpCone
+        conePickedUp = true;
+        return;
+    }
 
-long readSonarSensor()
-{
-    // Send a pulse to trigger the sonar sensor
-    digitalWrite(SONAR_SENSOR_TRIGGER, LOW);
-    delayMicroseconds(2);
-    digitalWrite(SONAR_SENSOR_TRIGGER, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(SONAR_SENSOR_TRIGGER, LOW);
+    // Check if the sensors are calibrated and if the game has not started yet
+    if (sensorsCalibrated && !gameStarted && conePickedUp)
+    {
+        // Start the game by turning left by 90 degrees
+        turnLeftMillis(90);
+        if (robotState != FOLLOW_LINE) return; // Ensure the robot is in the FOLLOW_LINE state before proceeding
+        gameStarted = true;
+    }
 
-    // Read the echo pin and calculate the distance
-    long duration = pulseIn(SONAR_SENSOR_ECHO, HIGH);
-    return duration * 0.034 / 2; // Convert duration to distance in cm by using the speed of sound (0.034 cm per microsecond)
-}
+    // Check if the game has started and if the game has not ended yet
+    if (gameStarted && !gameEnded)
+    {
+        // Get the line position and take action based on it
+        getLinePosition();
 
-// Drive with calibration
-void drive(int motorAForward, int motorABackward, int motorBForward, int motorBBackward)
-{
-    int calibratedAForward = calibrate(motorAForward, CALIBRATION_OFFSET_A);
-    int calibratedABackward = calibrate(motorABackward, CALIBRATION_OFFSET_A);
-    int calibratedBForward = calibrate(motorBForward, CALIBRATION_OFFSET_B);
-    int calibratedBBackward = calibrate(motorBBackward, CALIBRATION_OFFSET_B);
+        switch (linePosition)
+        {
+            case T_JUNCTION:
+                turnLeftMillis(90);
+                break;
 
-    analogWrite(MOTOR_A_FORWARD, calibratedAForward);
-    analogWrite(MOTOR_A_BACKWARD, calibratedABackward);
-    analogWrite(MOTOR_B_FORWARD, calibratedBForward);
-    analogWrite(MOTOR_B_BACKWARD, calibratedBBackward);
-}
+            case LEFT_LINE:
+                turnLeftMillis(70);
+                break;
 
-int calibrate(int n, int offset)
-{
-    int calibratedValue = n - offset; // Subtract the offset from the input value
-    return (calibratedValue < 0) ? 0 : calibratedValue; // Ensure the value doesn't go below 0
+            case NO_LINE:
+                turnAroundMillis();
+                break;
+
+            case RIGHT_LINE:
+                robotState = FOLLOW_LINE;
+                moveForwardPID(baseSpeed, baseSpeed, false, true);
+                break;
+
+            case CENTER_LINE:
+                if (robotState == FOLLOW_LINE)
+                {
+                    moveForwardPID(baseSpeed, baseSpeed, false, true);
+                    setDriveForwardColor();
+                }
+                break;
+
+            default:
+                // Handle unexpected line positions, if necessary
+                break;
+        }
+    }
 }

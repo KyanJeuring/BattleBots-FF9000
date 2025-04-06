@@ -1,0 +1,1 @@
+This class has to be copied in your main .ino file in order to be used

@@ -1,8 +1,9 @@
 #include <Arduino.h>
+#include <declare.cpp>
 
 // Define pins
-const int       MOTOR_A_BACKWARD = 11;
-const int       MOTOR_A_FORWARD = 10;
+const int       MOTOR_A_BACKWARD = 10;
+const int       MOTOR_A_FORWARD = 3;
 const int       MOTOR_B_FORWARD = 6;
 const int       MOTOR_B_BACKWARD = 5;
 const int       BUTTON_1 = 2;
@@ -102,15 +103,10 @@ void buttonPress()
 // Drive with calibration
 void drive(int motorAForward, int motorABackward, int motorBForward, int motorBBackward)
 {
-    int calibratedAForward = calibrate(motorAForward, CALIBRATION_OFFSET_A);
-    int calibratedABackward = calibrate(motorABackward, CALIBRATION_OFFSET_A);
-    int calibratedBForward = calibrate(motorBForward, CALIBRATION_OFFSET_B);
-    int calibratedBBackward = calibrate(motorBBackward, CALIBRATION_OFFSET_B);
-
-    analogWrite(MOTOR_A_FORWARD, calibratedAForward);
-    analogWrite(MOTOR_A_BACKWARD, calibratedABackward);
-    analogWrite(MOTOR_B_FORWARD, calibratedBForward);
-    analogWrite(MOTOR_B_BACKWARD, calibratedBBackward);
+    analogWrite(MOTOR_A_FORWARD, calibrate(motorAForward, CALIBRATION_OFFSET_A));
+    analogWrite(MOTOR_A_BACKWARD, calibrate(motorABackward, CALIBRATION_OFFSET_A));
+    analogWrite(MOTOR_B_FORWARD, calibrate(motorBForward, CALIBRATION_OFFSET_B));
+    analogWrite(MOTOR_B_BACKWARD, calibrate(motorBBackward, CALIBRATION_OFFSET_B));
 }
 
 int calibrate(int n, int offset)

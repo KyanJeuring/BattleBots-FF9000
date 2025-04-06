@@ -105,6 +105,7 @@ int readSensors() {
 }
 
 void PID_Linefollow(int error) {
+  Serial.println(error);
     int P = error;
     _integral += error;
     
@@ -161,8 +162,8 @@ void motor_drive(int left, int right) {
         analogWrite(IN3, 0);
         analogWrite(IN4, -right);
     }
-    Serial.print(left);
-    Serial.print("   ");
-    Serial.print(right);
-    Serial.println("");
+//    Serial.print(left);
+//    Serial.print("   ");
+//    Serial.print(right);
+//    Serial.println("");
 }
