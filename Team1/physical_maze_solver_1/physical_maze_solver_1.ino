@@ -4,18 +4,18 @@
 #include <Adafruit_NeoPixel.h>
 
 //---------------------------------------------------------------STATE VARIABLES
-boolean isStartSequenceActive = false;
-boolean isMazeNavigationActive = false;
+boolean       isStartSequenceActive     =         false;
+boolean       isMazeNavigationActive    =         false;
 
 //---------------------------------------------------------------LINE SENSORS
-const int lineSensorPins[] = {A0, A1, A2, A3, A4, A5, A6, A7};
-int blackLineThreshold = 800;
+const int     LINE_SENSOR_PINS[]        =         {A0, A1, A2, A3, A4, A5, A6, A7};
+#define       BLACK_LINE_THRESHOLD                800
 
 //---------------------------------------------------------------GRIPPER
-#define GRIPPER_SERVO_PIN 11
-#define SERVO_OPEN_POSITION 1600
-#define SERVO_CLOSE_POSITION  970
-#define SERVO_CYCLE_REPEAT 10
+#define       GRIPPER_SERVO_PIN                   11
+#define       SERVO_OPEN_POSITION                 1600
+#define       SERVO_CLOSE_POSITION                970
+#define       SERVO_CYCLE_REPEAT                  10
 
 //---------------------------------------------------------------DistanceSensor class
 class DistanceSensor
@@ -23,7 +23,7 @@ class DistanceSensor
   private:
     int trigPin;
     int echoPin;
-    const int maxDistance = 100; //set to -1 if you want no max Distance
+    const int MAX_DISTANCE = 100; //set to -1 if you want no max Distance
 
     // gets raw data from the sensor
     float getPulseDuration()
@@ -34,11 +34,11 @@ class DistanceSensor
       digitalWrite(trigPin, HIGH);
       delayMicroseconds(10);
       digitalWrite(trigPin, LOW);
-      if (maxDistance == -1)
+      if (MAX_DISTANCE == -1)
       {
         return pulseIn(echoPin, HIGH);
       } else {
-        return pulseIn(echoPin, HIGH, 60 * maxDistance); //24000 is for about 400cm, so if you want a limit of one meter just set it to 6000
+        return pulseIn(echoPin, HIGH, 60 * MAX_DISTANCE); //24000 is for about 400cm, so if you want a limit of one meter just set it to 6000
       }
     }
 
@@ -50,7 +50,7 @@ class DistanceSensor
       if (pulseDuration > 100) {
         distance = (pulseDuration * .0343) / 2;
       } else {
-        distance = maxDistance;
+        distance = MAX_DISTANCE;
       }
       return distance;
     }
@@ -118,29 +118,29 @@ DistanceSensor distanceSensorLeft = DistanceSensor(8, 13);
 int distanceLeft;
 
 //---------------------------------------------------------------MOTOR DISTANCES
-#define IN1 6     //Left motor forward
-#define IN2 10    //Left motor backwards
-#define IN3 5     //Right motor forward
-#define IN4 9     //Right motor backwards
-#define MOTOR_STALL_TIMEOUT 1700
-#define MAX_MOTOR_SPEED 255
+#define       IN1                                 6             //Left motor forward
+#define       IN2                                 10            //Left motor backwards
+#define       IN3                                 5             //Right motor forward
+#define       IN4                                 9             //Right motor backwards
+#define       MOTOR_STALL_TIMEOUT                 1700
+#define       MAX_MOTOR_SPEED                     255
 
 //---------------------------------------------------------------MOTOR ENCODERS
-#define LEFT_ENCODER_PIN  2
-#define RIGHT_ENCODER_PIN 3
-int leftEncoderCount;
-int rightEncoderCount;
-int totalLeftEncoderCount = 0, previousleftEncoderCount;
-int totalRightEncoderCount  = 0, previousrightEncoderCount;
+#define       LEFT_ENCODER_PIN                    2
+#define       RIGHT_ENCODER_PIN                   3
+int           leftEncoderCount            =       0;
+int           rightEncoderCount           =       0;
+int           totalLeftEncoderCount       =       0, previousleftEncoderCount;
+int           totalRightEncoderCount      =       0, previousrightEncoderCount;
 
 //---------------------------------------------------------------statusLEDs
-#define NEOPIXEL_PIN 12
+#define       NEOPIXEL_PIN                        12
 Adafruit_NeoPixel statusLEDs(4, NEOPIXEL_PIN, NEO_RGB + NEO_KHZ800);
-const uint32_t LED_COLOR_RED = statusLEDs.Color(255, 0, 0);
-const uint32_t LED_COLOR_YELLOW = statusLEDs.Color(255, 150, 0);
-const uint32_t LED_COLOR_BLUE = statusLEDs.Color(0, 0, 255);
-const uint32_t LED_COLOR_WHITE = statusLEDs.Color(255, 255, 255);
-const uint32_t LED_COLOR_OFF = statusLEDs.Color(0, 0, 0);
+const uint32_t  LED_COLOR_RED             =       statusLEDs.Color(255, 0, 0);
+const uint32_t  LED_COLOR_YELLOW          =       statusLEDs.Color(255, 150, 0);
+const uint32_t  LED_COLOR_BLUE            =       statusLEDs.Color(0, 0, 255);
+const uint32_t  LED_COLOR_WHITE           =       statusLEDs.Color(255, 255, 255);
+const uint32_t  LED_COLOR_OFF             =       statusLEDs.Color(0, 0, 0);
 
 //---------------------------------------------------------------FUNCTIONS
 void updateFrontDistance() {
@@ -151,7 +151,7 @@ void updateLeftDistance() {
   distanceLeft = distanceSensorLeft.getCuLED_COLOR_REDDistance();
 }
 
-void lineSensorPinsInit()
+void lineSensorsPinsInit()
 {
   pinMode(A0, INPUT);
   pinMode(A1, INPUT);
@@ -176,7 +176,7 @@ boolean reachedBlackZone()
   int count = 0;
   for (int i = 0; i < 8; i++)
   {
-    if (analogRead(lineSensorPins[i]) > blackLineThreshold)
+    if (analogRead(LINE_SENSOR_PINS[i]) > BLACK_LINE_THRESHOLD)
     {
       count++;
     }
@@ -222,78 +222,81 @@ void driveForward()
 {
   statusLEDs.fill(LED_COLOR_WHITE, 0, 4);
   statusLEDs.show();
-  analogWrite(IN1, MAX_MOTOR_SPEED * 0.9);
-  analogWrite(IN2, 0);
-  analogWrite(IN3, MAX_MOTOR_SPEED);
-  analogWrite(IN4, 0);
+
+  analogWrite(IN1,    MAX_MOTOR_SPEED * 0.9   );
+  analogWrite(IN2,    0                       );
+  analogWrite(IN3,    MAX_MOTOR_SPEED         );
+  analogWrite(IN4,    0                       );
 }
 
 void driveForwardSlow()
 {
   statusLEDs.fill(LED_COLOR_WHITE, 0, 4);
   statusLEDs.show();
-  analogWrite(IN1, MAX_MOTOR_SPEED * 0.6);
-  analogWrite(IN2, 0);
-  analogWrite(IN3, MAX_MOTOR_SPEED * 0.6);
-  analogWrite(IN4, 0);
+
+  analogWrite(IN1,    MAX_MOTOR_SPEED * 0.6   );
+  analogWrite(IN2,    0                       );
+  analogWrite(IN3,    MAX_MOTOR_SPEED * 0.6   );
+  analogWrite(IN4,    0                       );
 }
 
 void driveBackwardsRotate()
 {
-  analogWrite(IN1, 0);
-  analogWrite(IN2, MAX_MOTOR_SPEED * 0.4);
-  analogWrite(IN3, 0);
-  analogWrite(IN4, MAX_MOTOR_SPEED);
+  analogWrite(IN1,    0                        );
+  analogWrite(IN2,    MAX_MOTOR_SPEED * 0.4    );
+  analogWrite(IN3,    0                        );
+  analogWrite(IN4,    MAX_MOTOR_SPEED          );
 }
 
 void driveBackwards()
 {
-  analogWrite(IN1, 0);
-  analogWrite(IN2, MAX_MOTOR_SPEED);
-  analogWrite(IN3, 0);
-  analogWrite(IN4, MAX_MOTOR_SPEED);
+  analogWrite(IN1,    0                        );
+  analogWrite(IN2,    MAX_MOTOR_SPEED          );
+  analogWrite(IN3,    0                        );
+  analogWrite(IN4,    MAX_MOTOR_SPEED          );
 }
 
 void stopMotors()
 {
-  analogWrite(IN1, 0);
-  analogWrite(IN2, 0);
-  analogWrite(IN3, 0);
-  analogWrite(IN4, 0);
+  analogWrite(IN1,    0                        );
+  analogWrite(IN2,    0                        );
+  analogWrite(IN3,    0                        );
+  analogWrite(IN4,    0                        );
 }
 
 void turnLeft()
 {
   statusLEDs.fill(LED_COLOR_RED, 0, 4);
   statusLEDs.show();
-  analogWrite(IN1, 0);
-  analogWrite(IN2, 0);
-  analogWrite(IN3, MAX_MOTOR_SPEED * 0.8);
-  analogWrite(IN4, 0);
+
+  analogWrite(IN1,    0                        );
+  analogWrite(IN2,    0                        );
+  analogWrite(IN3,    MAX_MOTOR_SPEED * 0.8    );
+  analogWrite(IN4,    0                        );
 }
 
 void shiftLeft()
 {
-  analogWrite(IN1, MAX_MOTOR_SPEED);
-  analogWrite(IN2, 0);
-  analogWrite(IN3, MAX_MOTOR_SPEED * 0.7);
-  analogWrite(IN4, 0);
+  analogWrite(IN1,    MAX_MOTOR_SPEED          );
+  analogWrite(IN2,    0                        );
+  analogWrite(IN3,    MAX_MOTOR_SPEED * 0.7    );
+  analogWrite(IN4,    0                        );
 }
 
 void shiftRight()
 {
-  analogWrite(IN1, MAX_MOTOR_SPEED * 0.6);
-  analogWrite(IN2, 0);
-  analogWrite(IN3, MAX_MOTOR_SPEED);
-  analogWrite(IN4, 0);
+  analogWrite(IN1,    MAX_MOTOR_SPEED * 0.6    );
+  analogWrite(IN2,    0                        );
+  analogWrite(IN3,    MAX_MOTOR_SPEED          );
+  analogWrite(IN4,    0                        );
 }
 
 void rotate()
 {
-  analogWrite(IN1, MAX_MOTOR_SPEED * 0.8);
-  analogWrite(IN2, 0);
-  analogWrite(IN3, 0);
-  analogWrite(IN4, MAX_MOTOR_SPEED * 0.8);
+  analogWrite(IN1,    MAX_MOTOR_SPEED * 0.8    );
+  analogWrite(IN2,    0                        );
+  analogWrite(IN3,    0                        );
+  analogWrite(IN4,    MAX_MOTOR_SPEED * 0.8    );
 }
 
 void CountEncoder1()
@@ -315,11 +318,14 @@ void turnLeftOnPulses(int targetEncoderCount)
   stopMotors();
   leftEncoderCount = 0;
   rightEncoderCount = 0;
+
   int lastrightEncoderCount = -1;
   int lastleftEncoderCount = -1;
   long stallRecoveryDeadline = millis() + MOTOR_STALL_TIMEOUT;
+
   updateLeftDistance();
   turnLeft();
+
   while ((leftEncoderCount < targetEncoderCount && rightEncoderCount < targetEncoderCount) && distanceLeft >= 10)
   {
     if (leftEncoderCount == lastleftEncoderCount && rightEncoderCount == lastrightEncoderCount)
@@ -353,9 +359,11 @@ void driveForwardOnPulses(int targetEncoderCount)
   stopMotors();
   leftEncoderCount = 0;
   rightEncoderCount = 0;
+
   int lastrightEncoderCount = -1;
   int lastleftEncoderCount = -1;
   long stallRecoveryDeadline = millis() + MOTOR_STALL_TIMEOUT;
+
   if (distanceLeft <= 5)
   {
     shiftLeft();
@@ -403,7 +411,7 @@ void setup()
   pinMode(RIGHT_ENCODER_PIN, INPUT);
   attachInterrupt(digitalPinToInterrupt(LEFT_ENCODER_PIN ), CountEncoder1, CHANGE);
   attachInterrupt(digitalPinToInterrupt(RIGHT_ENCODER_PIN), CountEncoder2, CHANGE);
-  lineSensorPinsInit();
+  lineSensorsPinsInit();
   statusLEDs.begin();
   statusLEDs.fill(LED_COLOR_BLUE, 0, 4);
   statusLEDs.show();
@@ -419,9 +427,10 @@ void loop()
     closeGripper();
     updateFrontDistance();
     updateLeftDistance();
-    //    In case that there is a line, follow line
+
     if (reachedBlackZone())
     {
+      //In case that there is a line, follow line
       stopMotors();
       openGripper();
       pauseExecutionForMillis(300);
@@ -434,13 +443,12 @@ void loop()
     }
     if (distanceLeft <= 17 && distanceFront >= 12)
     {
-      //can't go left, can only go forward
+      //In case the robot can't go left, can only go forward
       driveForwardOnPulses(10);
-      //            pauseExecutionForMillis(100);
     }
     else if (distanceLeft > 17 && distanceFront > 12)
     {
-      //can go left and forward, will choose left
+      //In case the robot can go left and forward, will choose left
       turnLeftOnPulses(36);
       pauseExecutionForMillis(200);
       driveForwardOnPulses(20);
@@ -448,7 +456,7 @@ void loop()
     }
     else
     {
-      //can't go left, can't go forward, will rotate to the right
+      //In case the robot can't go left, can't go forward, will rotate to the right
       statusLEDs.fill(LED_COLOR_YELLOW, 0, 4);
       statusLEDs.show();
       driveBackwards();
